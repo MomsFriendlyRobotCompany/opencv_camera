@@ -1,5 +1,7 @@
 # OpenCV Camera
 
+![CheckPackage](https://github.com/MomsFriendlyRobotCompany/opencv_camera/workflows/CheckPackage/badge.svg)
+
 Simple threaded camera and calibration code.
 
 ## Install
