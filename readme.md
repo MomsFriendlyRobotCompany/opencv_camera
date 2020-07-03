@@ -1,6 +1,10 @@
 # OpenCV Camera
 
 ![CheckPackage](https://github.com/MomsFriendlyRobotCompany/opencv_camera/workflows/CheckPackage/badge.svg)
+![GitHub](https://img.shields.io/github/license/MomsFriendlyRobotCompany/opencv_camera)
+[![Latest Version](https://img.shields.io/pypi/v/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera/)
+[![image](https://img.shields.io/pypi/pyversions/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera)
+[![image](https://img.shields.io/pypi/format/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera)
 
 Simple threaded camera and calibration code.
 
