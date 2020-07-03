@@ -13,6 +13,8 @@ def get():
     for i in cal:
         im = cv2.imread(i,0)
         imgs.append(im)
+
+    print(f">> Found {len(imgs)} images")
     return imgs
 
 def test_checkerboard_calibrate():
