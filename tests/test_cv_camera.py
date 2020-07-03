@@ -9,7 +9,7 @@ import cv2
 
 def get():
     imgs = []
-    cal = glob('./cal_images/*.jpg')
+    cal = glob('cal_images/*.jpg')
     for i in cal:
         im = cv2.imread(i,0)
         imgs.append(im)
