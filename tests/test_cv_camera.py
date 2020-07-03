@@ -9,6 +9,7 @@ import opencv_camera
 import slurm
 import cv2
 import pathlib
+from slurm.files import rm
 
 def get():
     imgs = []
@@ -32,6 +33,15 @@ def test_info():
     assert True
 
 
+"""
+https://kushalvyas.github.io/calib.html
+Opencv cv2.calibrateCamera() function Camera Matrix:
+[
+    [532.79536563, 0, 342.4582516],
+    [0, 532.91928339, 233.90060514],
+    [0, 0, 1]
+]
+"""
 def test_checkerboard_calibrate():
     print("")
     imgs = get()
@@ -67,5 +77,8 @@ def test_save():
     mpeg.close()
 
     mpeg.write_list(imgs,fps=1, fname="batch.mp4")
+
+    rm("batch.mp4")
+    rm("single.mp4")
 
     assert True

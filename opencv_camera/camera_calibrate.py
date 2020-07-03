@@ -21,6 +21,8 @@ class CameraCalibration:
     marker_size = attr.ib()
     marker_scale = attr.ib(default=1)
     save_cal_imgs = attr.ib(default=None)
+    save_objpoints = attr.ib(default=None)
+    save_imgpoints = attr.ib(default=None)
 
     def calculateReprojectionError(self, imgpoints, objpoints, rvecs, tvecs, mtx, dist):
         """
@@ -30,32 +32,29 @@ class CameraCalibration:
         tvecs: translations
         mtx: camera matrix
         dist: distortion coefficients [k1,k2,p1,p2,k3]
+
+        returns:
+            mean_error, x_error[list], y_error[list]
         """
         imgpoints = [c.reshape(-1,2) for c in imgpoints]
         mean_error = 0
         error_x = []
         error_y = []
         for i in range(len(objpoints)):
-#             print('img',imgpoints[i].shape)
-#             print('obj', objpoints[i].shape)
             imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
             imgpoints2 = imgpoints2.reshape(-1,2)
-#             print('img2', imgpoints2.shape)
 
             # if not all markers were found, then the norm below will fail
             if len(imgpoints[i]) != len(imgpoints2):
                 continue
 
-#             error_x.append(imgpoints2)
-#             error_y.append(imgpoints2[1])
             error_x += list(imgpoints2[:,0] - imgpoints[i][:,0])
             error_y += list(imgpoints2[:,1] - imgpoints[i][:,1])
-#             print(imgpoints2)
 
             error = cv2.norm(imgpoints[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
             mean_error += error
+
         m_error = mean_error/len(objpoints)
-#         print( "total error: {}".format(m_error) )
         return m_error, error_x, error_y
 
     def findMarkers(self, gray):
@@ -142,6 +141,9 @@ class CameraCalibration:
 
          dist = dist[0]
 
+         self.save_objpoints = objpoints
+         self.save_imgpoints = imgpoints
+
          data = {
              'date': time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()),
              'markerType': self.marker_type,
@@ -159,26 +161,13 @@ class CameraCalibration:
 
 @attr.s(slots=True)
 class UnDistort:
-
     dist_coeff = attr.ib()
     camera_matrix = attr.ib()
     newcameramtx = attr.ib(default=None)
-
-    def crop(self, rows, cols, alpha=1):
-        """
-        alpha = 0: returns undistored image with minimum unwanted pixels (image
-                    pixels at corners/edges could be missing)
-        alpha = 1: retains all image pixels but there will be black to make up
-                    for warped image correction
-        """
-        self.newcameramtx, _ = cv2.getOptimalNewCameraMatrix(
-            self.camera_matrix,
-            self.dist_coeff,
-            (cols, rows),
-            alpha)
+    alpha = attr.ib(default=None)
 
     # use a calibration matrix to undistort an image
-    def undistort(self, image, alpha=1):
+    def undistort(self, image, alpha):
         """
         image: an image
 
@@ -187,9 +176,15 @@ class UnDistort:
         alpha = 1: retains all image pixels but there will be black to make up
                     for warped image correction
         """
-        if self.newcameramtx is None:
+        if (self.newcameramtx is None) or (alpha != self.alpha):
+            self.alpha = alpha
             rows, cols = image.shape[:2]
-            self.crop(rows, cols, alpha)
+
+            self.newcameramtx, _ = cv2.getOptimalNewCameraMatrix(
+                self.camera_matrix,
+                self.dist_coeff,
+                (cols, rows),
+                self.alpha)
 
         return cv2.undistort(
             image,
@@ -197,32 +192,3 @@ class UnDistort:
             self.dist_coeff,
             None,
             self.newcameramtx)
-
-#
-# @attr.s(slots=True)
-# class FlipBook:
-#     imgs = attr.ib()
-#     auto = attr.ib(default=True)
-#
-#     def run(self):
-#         print('---------------------------------')
-#         print(' ESC/q to quit')
-#         print(' spacebar to pause/continue')
-#         print('---------------------------------')
-#
-#         s = self.imgs[0].shape
-#         if self.auto:
-#             delay = 500
-#         else:
-#             delay = 0
-#
-#         for img in self.imgs:
-#             cv2.imshow(f"{s}", img)
-#
-#             ch = cv2.waitKey(delay)
-#             if ch in [27, ord('q')]:
-#                 break
-#             elif ch == ord(' '):
-#                 delay = 0 if delay > 0 else 500
-#
-#         cv2.destroyAllWindows()
