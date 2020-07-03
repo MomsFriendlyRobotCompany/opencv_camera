@@ -5,6 +5,8 @@ from opencv_camera import FlipBook
 from opencv_camera import UnDistort
 from opencv_camera import SaveVideo
 from glob import glob
+import opencv_camera
+import slurm
 import cv2
 
 def get():
@@ -17,7 +19,17 @@ def get():
     print(f">> Found {len(imgs)} images")
     return imgs
 
+def test_info():
+    print("")
+    print(f">> opencv_camera version: {opencv_camera.__version__}")
+    print(f">> cv2 version: {cv2.__version__}")
+    print(f">> slurm version: {slurm.__version__}")
+
+    assert True
+
+
 def test_checkerboard_calibrate():
+    print("")
     imgs = get()
 
     cal = CameraCalibration(Markers.checkerboard, marker_size=(9, 6))
@@ -41,6 +53,7 @@ def test_checkerboard_calibrate():
     # fb.run()
 
 def test_save():
+    print("")
     imgs = get()
     h,w = imgs[0].shape[:2]
     mpeg = SaveVideo()
