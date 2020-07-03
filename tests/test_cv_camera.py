@@ -8,10 +8,14 @@ from glob import glob
 import opencv_camera
 import slurm
 import cv2
+import pathlib
 
 def get():
     imgs = []
-    cal = glob('cal_images/*.jpg')
+    search = 'cal_images/*.jpg'
+    base = pathlib.Path(__file__).parent.absolute()
+    path = f"{base}/{search}"
+    cal = glob(path)
     for i in cal:
         im = cv2.imread(i,0)
         imgs.append(im)

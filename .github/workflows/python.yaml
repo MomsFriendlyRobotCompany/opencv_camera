@@ -38,7 +38,7 @@ jobs:
             - name: Install packages
               run: poetry install
             - name: Run PyTest
-              run: poetry run cd tests && pytest
+              run: poetry run pytest
             # - name: Run mypy
             #   run: poetry run mypy pyservos
             # - name: nosetests
