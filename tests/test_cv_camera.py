@@ -9,7 +9,7 @@ import cv2
 
 def get():
     imgs = []
-    cal = glob('./cal_images/*.png')
+    cal = glob('./cal_images/*.jpg')
     for i in cal:
         im = cv2.imread(i,0)
         imgs.append(im)
@@ -21,6 +21,10 @@ def test_checkerboard_calibrate():
     cal = CameraCalibration(Markers.checkerboard, marker_size=(9, 6))
     data = cal.calibrate(imgs)
     assert (data['rms'] - 0.5882563398961391) < 1e-6
+
+    print("camera matrix\n",data["cameraMatrix"],"\n")
+    print("distortion coeff:",data["distCoeffs"],"\n")
+    print("rms error:",data["rms"],"\n")
 
     # fb = FlipBook(cal.save_cal_imgs)
     # fb.run()
