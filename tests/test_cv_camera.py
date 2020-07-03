@@ -36,7 +36,7 @@ def test_checkerboard_calibrate():
 
 def test_save():
     imgs = get()
-    h,w = imgs[0].shape
+    h,w = imgs[0].shape[:2]
     mpeg = SaveVideo()
     mpeg.open("single.mp4",w,h,fps=1)
     for i in imgs:
