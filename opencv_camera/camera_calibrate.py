@@ -21,8 +21,8 @@ class CameraCalibration:
     marker_size = attr.ib()
     marker_scale = attr.ib(default=1)
     save_cal_imgs = attr.ib(default=None)
-    save_objpoints = attr.ib(default=None)
-    save_imgpoints = attr.ib(default=None)
+    # save_objpoints = attr.ib(default=None)
+    # save_imgpoints = attr.ib(default=None)
 
     def calculateReprojectionError(self, imgpoints, objpoints, rvecs, tvecs, mtx, dist):
         """
@@ -141,8 +141,8 @@ class CameraCalibration:
 
          dist = dist[0]
 
-         self.save_objpoints = objpoints
-         self.save_imgpoints = imgpoints
+         # self.save_objpoints = objpoints
+         # self.save_imgpoints = imgpoints
 
          data = {
              'date': time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()),
@@ -153,7 +153,9 @@ class CameraCalibration:
              'distCoeffs': DistortionCoefficients(*dist),
              'rms': rms,
              'rvecs': rvecs,
-             'tvecs': tvecs
+             'tvecs': tvecs,
+             "objpoints": objpoints,
+             "imgpoints": imgpoints
         }
 
          return data
