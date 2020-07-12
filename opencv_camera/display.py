@@ -1,12 +1,12 @@
-# import numpy as np
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2014 Kevin Walchko
+# see LICENSE for full details
+##############################################
+# -*- coding: utf-8 -*
 import cv2
-# from glob import glob
-# import yaml
-# import json
 import attr
-# from enum import Enum
 import time
-# from collections import namedtuple
 
 
 @attr.s(slots=True)
