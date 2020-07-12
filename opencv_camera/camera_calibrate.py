@@ -10,7 +10,7 @@ from collections import namedtuple
 
 
 DistortionCoefficients = namedtuple("DistortionCoefficients", "k1 k2 p1 p2 k3")
-Markers = Enum('Markers', 'checkerboard circle acircle')
+Markers = Enum('Markers', 'checkerboard circle acircle apriltag')
 
 @attr.s(slots=True)
 class CameraCalibration:
