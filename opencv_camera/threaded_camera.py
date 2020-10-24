@@ -14,6 +14,7 @@ import cv2
 from enum import IntFlag
 import attr
 
+#                                   1   2   3   4
 ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
 
 @attr.s(slots=True)

@@ -29,9 +29,11 @@ classifiers = [
 ]
 
 [tool.poetry.scripts]
-create_monitor = "opencv_camera.bin.camera_calibrate:main"
-create_reset = "opencv_camera.bin.mjpeg_server:main"
-create_shutdown = "opencv_camera.bin.video_capture:main"
+opencv_calibrate = "opencv_camera.bin.camera_calibrate:main"
+opencv_mjpeg = "opencv_camera.bin.mjpeg_server:main"
+opencv_capture = "opencv_camera.bin.video_capture:main"
+udp_server = "opencv_camera.bin.udp_server:main"
+udp_client = "opencv_camera.bin.udp_client:main"
 
 [tool.poetry.dependencies]
 python = ">=3.6"

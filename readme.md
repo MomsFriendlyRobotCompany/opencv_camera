@@ -12,13 +12,25 @@ Simple threaded camera and calibration code.
 
 The preferred way to install is using `pip`:
 
-    pip install opencv_camera
+```
+pip install opencv_camera
+```
 
+## Apps
+
+Use `program --help` to display switches for each of the following:
+
+- `opencv_calibrate`: calibrate a camera
+- `opencv_capture`: simple tool to capture and save images
+- `opencv_mjpeg`: sets up a simple jmpeg server so you can view images in a web browser
+- `udp_server x.x.x.x`: sends camera images via UDP
+- `udp_client x.x.x.x`: displays UDP camera images from server
 
 # Change Log
 
 | Data       | Version| Notes                                     |
 |------------|--------|-------------------------------------------|
+| 2018-07-19 | 0.10.6 |  added UDP image server and client |
 | 2018-07-19 | 0.10.0 |  renamed and focused on camera |
 | 2018-07-19 |  0.9.4 |  simple clean-up and updating some things |
 | 2017-10-29 |  0.9.3 |  bug fixes |
