@@ -43,6 +43,7 @@ numpy = "*"
 pyyaml = "*"
 opencv_python = "*"
 slurm = "*"
+numpy_camera = "*"
 importlib-metadata = {version="*", python="<3.8"}
 
 [tool.poetry.dev-dependencies]

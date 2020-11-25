@@ -8,7 +8,6 @@
 #
 # Author: Kevin J. Walchko
 # Date: 11 May 2014
-# Version: 0.3
 # -------------------------------
 #
 
@@ -111,7 +110,7 @@ if __name__ == '__main__':
         if ch in [27, ord('q')]:
             if video:
                 save.release()
-            exit(0)
+            break
 
         # Start/Stop capturing video
         elif ch == ord('v'):
