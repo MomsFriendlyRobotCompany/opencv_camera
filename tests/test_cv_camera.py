@@ -4,19 +4,20 @@ from opencv_camera import Markers
 from opencv_camera import FlipBook
 from opencv_camera import UnDistort
 from opencv_camera.save_video import SaveVideo
-from glob import glob
+# from glob import glob
 import opencv_camera
 import slurm
 import cv2
-import pathlib
+from pathlib import Path
 from slurm.files import rm
 
 def get():
     imgs = []
-    search = 'cal_images/*.jpg'
-    base = pathlib.Path(__file__).parent.absolute()
-    path = f"{base}/{search}"
-    cal = glob(path)
+
+    p = Path(__file__).parent.absolute() / "cal_images"
+    pp = p.glob("*.jpg")
+    cal = [str(x) for x in pp]
+
     for i in cal:
         im = cv2.imread(i,0)
         imgs.append(im)
@@ -76,7 +77,12 @@ def test_save():
         mpeg.write(i)
     mpeg.close()
 
+    p = Path("single.mp4")
+    assert p.stat().st_size > 0 and p.exists()
+
     mpeg.write_list(imgs,fps=1, fname="batch.mp4")
+    p = Path("batch.mp4")
+    assert p.stat().st_size > 0 and p.exists()
 
     rm("batch.mp4")
     rm("single.mp4")
