@@ -1,13 +1,16 @@
 
 from opencv_camera import CameraCalibration
-from opencv_camera import Markers
-from opencv_camera import FlipBook
+from opencv_camera.targets.chessboard import ChessboardFinder
+# from opencv_camera import Markers
+# from opencv_camera import FlipBook
 from opencv_camera import UnDistort
 from opencv_camera.save_video import SaveVideo
+from opencv_camera.color_space import bgr2gray, gray2bgr
 # from glob import glob
 import opencv_camera
 import slurm
 import cv2
+import numpy as np
 from pathlib import Path
 from slurm.files import rm
 
@@ -19,7 +22,7 @@ def get():
     cal = [str(x) for x in pp]
 
     for i in cal:
-        im = cv2.imread(i,0)
+        im = cv2.imread(i)
         imgs.append(im)
 
     print(f">> Found {len(imgs)} images")
@@ -47,13 +50,15 @@ def test_checkerboard_calibrate():
     print("")
     imgs = get()
 
-    cal = CameraCalibration(Markers.checkerboard, marker_size=(9, 6))
-    data = cal.calibrate(imgs)
+    board = ChessboardFinder((9,6), 1)
+
+    cal = CameraCalibration()
+    data = cal.calibrate(imgs, board)
     assert (data['rms'] - 0.5882563398961391) < 1e-6
 
     print("camera matrix\n",data["cameraMatrix"],"\n")
     print("distortion coeff:",data["distCoeffs"],"\n")
-    print("rms error:",data["rms"],"\n")
+    # print("rms error:",data["rms"],"\n")
 
     # fb = FlipBook(cal.save_cal_imgs)
     # fb.run()
@@ -88,3 +93,10 @@ def test_save():
     rm("single.mp4")
 
     assert True
+
+def test_colorspace():
+    im = cv2.imread("cal_images/left01.jpg")
+    g = bgr2gray(im)
+    c = gray2bgr(g)
+    assert len(g.shape) == 2
+    assert len(c.shape) == 3

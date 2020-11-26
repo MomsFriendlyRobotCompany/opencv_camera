@@ -4,19 +4,27 @@ import numpy as np
 
 class Stereo2PointCloud:
     def __init__(self, baseline, focalLength, h, w):
-        self.baseline = baseline
-        self.f = focalLength
-        self.w = w
-        self.h = h
+        # self.baseline = baseline
+        # self.f = focalLength
+        # self.w = w
+        # self.h = h
 
-    def to_pc(self, imgL, imgR):
+        t = baseline
+        f = focalLength
+        Q = np.float32([[1, 0, 0, -0.5*w],
+                        [0, 1, 0, -0.5*h],
+                        [0, 0, 0,      f],
+                        [0, 0,-1/t,    0]])
+        self.Q = Q
+        print(Q)
+
         ch = 3 # channels
         window_size = 5 # SADWindowSize
         min_disp = 16*0
         num_disp = 16*4-min_disp
 #         stereo = cv2.StereoBM_create(numDisparities=96, blockSize=5)
 #         stereo = cv2.StereoSGBM_create(0,64,21)
-        stereo = cv2.StereoSGBM_create(
+        self.matcher = cv2.StereoSGBM_create(
             minDisparity = min_disp,
             numDisparities = num_disp,
             blockSize = 16,          # 3-11
@@ -28,13 +36,14 @@ class Stereo2PointCloud:
             speckleRange = 32         # 1-2
         )
 
-        disp = stereo.compute(imgL, imgR).astype(np.float32) / 16.0
+    def to_pc(self, imgL, imgR):
+        disp = self.matcher.compute(imgL, imgR).astype(np.float32) / 16.0
 #         disp = stereo.compute(imgR, imgL).astype(np.float32) / 16.0 # <<<<<<<<
-        dm = (disp-min_disp)/num_disp
+        # dm = (disp-min_disp)/num_disp
 
         print(f">> Computed disparity, {disp.shape} pts")
         print(f">> Disparity max: {disp.max()}, min: {disp.min()}")
-        return disp, dm
+        return disp #, dm
 
     def reproject(self, img, disp):
         if len(img.shape) == 2:
@@ -42,15 +51,15 @@ class Stereo2PointCloud:
         else:
             colors = img
 
-        t = self.baseline
-        f = self.f
-        Q = np.float32([[1, 0, 0, -0.5*w],
-                        [0, 1, 0, -0.5*h],
-                        [0, 0, 0,      f],
-                        [0, 0,-1/t,    0]])
-        print(Q)
+        # t = self.baseline
+        # f = self.f
+        # Q = np.float32([[1, 0, 0, -0.5*w],
+        #                 [0, 1, 0, -0.5*h],
+        #                 [0, 0, 0,      f],
+        #                 [0, 0,-1/t,    0]])
+        # print(Q)
 
-        points = cv2.reprojectImageTo3D(disp, Q)
+        points = cv2.reprojectImageTo3D(disp, self.Q)
 #         mask = disp > disp.min()  # find pts with min depth
 #         mask = disp > 1
 
@@ -60,6 +69,7 @@ class Stereo2PointCloud:
 
         print(colors.shape, points.shape, disp.shape)
 
+        # filter out NaN and inf (disparity == 0)
         mask = (
             (disp > disp.min()) &
             np.all(~np.isnan(points), axis=1) &
@@ -69,7 +79,7 @@ class Stereo2PointCloud:
         out_points = points[mask] # remove pts with no depth
         out_colors = colors[mask] # remove pts with no depth
 
-        print(f'>> Generated 3d point cloud, {out_points.shape}')
-        print(f">> out_points {out_points.max()}, {out_points.min()}")
+        # print(f'>> Generated 3d point cloud, {out_points.shape}')
+        # print(f">> out_points {out_points.max()}, {out_points.min()}")
 
         return out_points, out_colors

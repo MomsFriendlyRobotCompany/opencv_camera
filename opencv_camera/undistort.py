@@ -68,3 +68,9 @@ class UnDistort:
             )
         # undistort
         return cv2.undistort(image, self.camMat, self.dist, None, self.optCamMat)
+
+    def distortionMap(self):
+        """
+        Return a numpy array representing the image distortion
+        """
+        raise NotImplemented()
