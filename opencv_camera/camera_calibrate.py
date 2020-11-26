@@ -13,9 +13,10 @@ import attr
 from enum import Enum
 import time
 from collections import namedtuple
+from .undistort import DistortionCoefficients
 
 
-DistortionCoefficients = namedtuple("DistortionCoefficients", "k1 k2 p1 p2 k3")
+# DistortionCoefficients = namedtuple("DistortionCoefficients", "k1 k2 p1 p2 k3")
 Markers = Enum('Markers', 'checkerboard circle acircle apriltag')
 
 @attr.s(slots=True)
@@ -167,36 +168,65 @@ class CameraCalibration:
          return data
 
 
-@attr.s(slots=True)
-class UnDistort:
-    dist_coeff = attr.ib()
-    camera_matrix = attr.ib()
-    newcameramtx = attr.ib(default=None)
-    alpha = attr.ib(default=None)
+# class Undistort:
+#     def __init__(self, camMat, dist, w, h):
+#         self.camMat = camMat
+#         self.dist = dist
+#         self.size = (w,h)
+#         self.optCamMat, _ = cv2.getOptimalNewCameraMatrix(camMat, dist, self.size, 0)
+#
+#     def undistort(self, image, alpha=None):
+#         """
+#         image: an image
+#         mtx: camera matrix
+#         dist: distortion coefficients
+#         alpha = 0: returns undistored image with minimum unwanted pixels (image
+#                     pixels at corners/edges could be missing)
+#         alpha = 1: retains all image pixels but there will be black to make up
+#                     for warped image correction
+#         """
+#         # Adjust the calibrations matrix
+#         if alpha is not None:
+#             self.optCamMat, _ = cv2.getOptimalNewCameraMatrix(
+#                 self.camMat,
+#                 self.dist,
+#                 self.size,
+#                 alpha
+#             )
+#         # undistort
+#         return cv2.undistort(image, self.camMat, self.dist, None, self.optCamMat)
 
-    # use a calibration matrix to undistort an image
-    def undistort(self, image, alpha):
-        """
-        image: an image
 
-        alpha = 0: returns undistored image with minimum unwanted pixels (image
-                    pixels at corners/edges could be missing)
-        alpha = 1: retains all image pixels but there will be black to make up
-                    for warped image correction
-        """
-        if (self.newcameramtx is None) or (alpha != self.alpha):
-            self.alpha = alpha
-            rows, cols = image.shape[:2]
-
-            self.newcameramtx, _ = cv2.getOptimalNewCameraMatrix(
-                self.camera_matrix,
-                self.dist_coeff,
-                (cols, rows),
-                self.alpha)
-
-        return cv2.undistort(
-            image,
-            self.camera_matrix,
-            self.dist_coeff,
-            None,
-            self.newcameramtx)
+# @attr.s(slots=True)
+# class UnDistort:
+#     dist_coeff = attr.ib()
+#     camera_matrix = attr.ib()
+#     newcameramtx = attr.ib(default=None)
+#     alpha = attr.ib(default=None)
+#
+#     # use a calibration matrix to undistort an image
+#     def undistort(self, image, alpha):
+#         """
+#         image: an image
+#
+#         alpha = 0: returns undistored image with minimum unwanted pixels (image
+#                     pixels at corners/edges could be missing)
+#         alpha = 1: retains all image pixels but there will be black to make up
+#                     for warped image correction
+#         """
+#         if (self.newcameramtx is None) or (alpha != self.alpha):
+#             self.alpha = alpha
+#             rows, cols = image.shape[:2]
+#
+#             self.newcameramtx, _ = cv2.getOptimalNewCameraMatrix(
+#                 self.camera_matrix,
+#                 self.dist_coeff,
+#                 (cols, rows),
+#                 self.alpha)
+#
+#         return cv2.undistort(
+#             image,
+#             self.camera_matrix,
+#             self.dist_coeff,
+#             None,
+#             self.newcameramtx)

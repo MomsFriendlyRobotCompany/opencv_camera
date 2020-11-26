@@ -11,11 +11,12 @@ import time
 from slurm.rate import Rate
 import numpy as np
 import cv2
-from enum import IntFlag
+# from enum import IntFlag
 import attr
+from .color_space import ColorSpace
 
 #                                   1   2   3   4
-ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
+# ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
 
 @attr.s(slots=True)
 class ThreadedCamera:

@@ -3,7 +3,7 @@ from opencv_camera import CameraCalibration
 from opencv_camera import Markers
 from opencv_camera import FlipBook
 from opencv_camera import UnDistort
-from opencv_camera import SaveVideo
+from opencv_camera.save_video import SaveVideo
 from glob import glob
 import opencv_camera
 import slurm
