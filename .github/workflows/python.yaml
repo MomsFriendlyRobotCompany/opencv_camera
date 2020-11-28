@@ -6,37 +6,36 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
           max-parallel: 5
+          fail-fast: true
           matrix:
             python-version: [3.6, 3.7, 3.8]
         steps:
             - uses: actions/checkout@master
             - name: Setup Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v2
               with:
-                python-version: ${{ matrix.python-version }} # Version range or exact version of a Python version to use, using semvers version range syntax.
-                # architecture: 'x64' # (x64 or x86)
-            # - name: Set up Python ${{ matrix.python-version }}
-            #   uses: actions/setup-python@v1
-            #   with:
-            #     python-version: ${{ matrix.python-version }}
-            # - name: Install dependencies
-            #   run: |
-            #     python -m pip install --upgrade pip setuptools wheel build_utils
-            # - name: Lint with flake8
-            #   run: |
-            #     pip install flake8
-            #     # stop the build if there are Python syntax errors or undefined names
-            #     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-            #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-            #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+                python-version: ${{ matrix.python-version }}
             - name: Install Poetry
               uses: snok/install-poetry@v1.1.1
+                with:
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+              #----------------------------------------------
+              #       load cached venv if cache exists
+              #----------------------------------------------
+            - name: Load cached venv
+              id: cached-poetry-dependencies
+              uses: actions/cache@v2
+              with:
+                path: .venv
+                key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
               # with:
               #   version: 1.0.0b3
             # - name: Turn off Virtualenvs
             #   run: poetry config virtualenvs.create false
             - name: Install packages
               run: poetry install
+              if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
             - name: Run PyTest
               run: |
                 source .venv/bin/activate
