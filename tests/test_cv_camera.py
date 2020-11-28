@@ -95,7 +95,8 @@ def test_save():
     assert True
 
 def test_colorspace():
-    im = cv2.imread("cal_images/left01.jpg")
+    p = Path(__file__).parent.absolute() / "cal_images/left01.jpg"
+    im = cv2.imread( str(p) )
     g = bgr2gray(im)
     c = gray2bgr(g)
     assert len(g.shape) == 2

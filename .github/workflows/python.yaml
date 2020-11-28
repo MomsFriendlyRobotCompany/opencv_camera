@@ -33,12 +33,14 @@ jobs:
               uses: snok/install-poetry@v1.1.1
               # with:
               #   version: 1.0.0b3
-            - name: Turn off Virtualenvs
-              run: poetry config virtualenvs.create false
+            # - name: Turn off Virtualenvs
+            #   run: poetry config virtualenvs.create false
             - name: Install packages
               run: poetry install
             - name: Run PyTest
-              run: poetry run pytest
+              run: |
+                source .venv/bin/activate
+                pytest tests/
             # - name: Run mypy
             #   run: poetry run mypy pyservos
             # - name: nosetests
