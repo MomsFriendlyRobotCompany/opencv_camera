@@ -11,6 +11,5 @@ build
 .ipynb_checkpoints
 *.mp4
 *.m4v
-stereo
 *.lock
 .*_cache

@@ -5,9 +5,10 @@
 ##############################################
 # -*- coding: utf-8 -*
 import numpy as np
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 import cv2
+from colorama import Fore
 # from glob import glob
 # import yaml
 # import json
@@ -17,6 +18,39 @@ import time
 # from collections import namedtuple
 from .undistort import DistortionCoefficients
 from .color_space import bgr2gray, gray2bgr
+from .camera_calibrate import CameraCalibration
+
+
+class StereoCamera:
+    R = None
+    F = None
+    E = None
+    T = None
+    K1 = None
+    K2 = None
+    d1 = None
+    d2 = None
+
+    def __str__(self):
+        ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))
+        s = f'{Fore.BLUE}Camera 1 --------------------------\n'
+        s += f'  focalLength(x,y): {self.K1[0,0]:.1f} {self.K1[1,1]:.1f} px \n'
+        s += f'  principlePoint(x,y): {self.K1[0,2]:.1f} {self.K1[1,2]:.1f} px\n'
+        s += f'  distortionCoeffs: {self.d1}\n'
+
+        s += f'{Fore.GREEN}Camera 2 --------------------------\n'
+        s += f'  focalLength(x,y): {self.K2[0,0]:.1f} {self.K2[1,1]:.1f} px \n'
+        s += f'  principlePoint(x,y): {self.K2[0,2]:.1f} {self.K2[1,2]:.1f} px\n'
+        s += f'  distortionCoeffs: {self.d2}\n'
+
+        s += f"{Fore.MAGENTA}"
+        s += 'Extrinsic Camera Parameters -------\n'
+        s += f"  Translation between Left/Right Camera: {self.T.T[0]}\n"
+        s += f"  Rotation between Left/Right Camera:\n{ms(self.R)}\n"
+        s += f"  Essential Matrix:\n{ms(self.E)}\n"
+        s += f'  Fundatmental Matrix:\n{ms(self.F)}\n'
+        s += f"{Fore.RESET}"
+        return s
 
 
 class StereoCalibration(object):
@@ -27,14 +61,14 @@ class StereoCalibration(object):
         # self.camera_model = None
         self.save_cal_imgs = None
 
-        if R is None:
-            R = np.eye(3) # no rotation between left/right camera
-        self.R = R
-
-        if t is None:
-            t = np.array([0.1,0,0]) # 100mm baseline
-            t.reshape((3,1))
-        self.t = t
+        # if R is None:
+        #     R = np.eye(3) # no rotation between left/right camera
+        # self.R = R
+        #
+        # if t is None:
+        #     t = np.array([0.1,0,0]) # 100mm baseline
+        #     t.reshape((3,1))
+        # self.t = t
 
     # def save(self, filename, handler=pickle):
     #     if self.camera_model is None:
@@ -43,7 +77,7 @@ class StereoCalibration(object):
     #     with open(filename, 'wb') as f:
     #         handler.dump(self.camera_model, f)
 
-    def stereo_calibrate(self, imgs_l, imgs_r, board, flags=None):
+    def calibrate(self, imgs_l, imgs_r, board, flags=None):
         """
         This will save the found markers for camera_2 (right) only in
         self.save_cal_imgs array
@@ -63,24 +97,29 @@ class StereoCalibration(object):
         # rms2, M2, d2, r2, t2, objpoints, imgpoints_r = cc.calibrate(imgs_r, board)
 
         data = cc.calibrate(imgs_l, board)
-        M1 = data["cameraMatrix"]
+        K1 = data["cameraMatrix"]
         d1 = data["distCoeffs"]
         objpoints = data["objpoints"]
         imgpoints_l =  data["imgpoints"]
 
         data = cc.calibrate(imgs_r, board)
-        M1 = data["cameraMatrix"]
-        d1 = data["distCoeffs"]
-        imgpoints_l =  data["imgpoints"]
+        K2 = data["cameraMatrix"]
+        d2 = data["distCoeffs"]
+        imgpoints_r =  data["imgpoints"]
+
+        print(d1,d2)
 
         self.save_cal_imgs = cc.save_cal_imgs
 
+        """
+        CALIB_ZERO_DISPARITY: horizontal shift, cx1 == cx2
+        """
         if flags is None:
             flags = 0
             # flags |= cv2.CALIB_FIX_INTRINSIC
             flags |= cv2.CALIB_ZERO_DISPARITY
             # flags |= cv2.CALIB_FIX_PRINCIPAL_POINT
-            flags |= cv2.CALIB_USE_INTRINSIC_GUESS  # make an inital guess at cameraMatrix (K)
+            # flags |= cv2.CALIB_USE_INTRINSIC_GUESS
             # flags |= cv2.CALIB_FIX_FOCAL_LENGTH
             # flags |= cv2.CALIB_FIX_ASPECT_RATIO
             # flags |= cv2.CALIB_ZERO_TANGENT_DIST
@@ -93,47 +132,22 @@ class StereoCalibration(object):
         stereocalib_criteria = (cv2.TERM_CRITERIA_MAX_ITER +
                                 cv2.TERM_CRITERIA_EPS, 100, 1e-5)
 
+        h,w = imgs_l[0].shape[:2]
         ret, K1, d1, K2, d2, R, T, E, F = cv2.stereoCalibrate(
             objpoints,
             imgpoints_l,
             imgpoints_r,
             K1, d1,
             K2, d2,
-            imgs_l[0].shape[:2],
-            R=self.R,
-            T=self.T,
+            # (w,h),
+            (h,w),
+            # R=self.R,
+            # T=self.t,
             criteria=stereocalib_criteria,
             flags=flags)
 
-        print('-'*50)
-        print('Image: {}x{}'.format(*imgs_l[0].shape[:2]))
-        print('{}: {}'.format(marker_type, marker_size))
-        print('Intrinsic Camera Parameters')
-        print('-'*50)
-        print(' [Camera 1]')
-        # print('  cameraMatrix_1', M1)
-        print('  f(x,y): {:.1f} {:.1f} px'.format(K1[0,0], K1[1,1]))
-        print('  principlePoint(x,y): {:.1f} {:.1f} px'.format(K1[0,2], K1[1,2]))
-        print('  distCoeffs', d1[0])
-        print(' [Camera 2]')
-        # print('  cameraMatrix_2', M2)
-        print('  f(x,y): {:.1f} {:.1f} px'.format(K2[0,0], K2[1,1]))
-        print('  principlePoint(x,y): {:.1f} {:.1f} px'.format(K2[0,2], K2[1,2]))
-        print('  distCoeffs', d2[0])
-        print('-'*50)
-        print('Extrinsic Camera Parameters')
-        print('-'*50)
-        print('  R', R)
-        print('  T[meter]', T)
-        print('  E', E)
-        print('  F', F)
-
-        # for i in range(len(r1)):
-        #     print("--- pose[", i+1, "] ---")
-        #     ext1, _ = cv2.Rodrigues(r1[i])
-        #     ext2, _ = cv2.Rodrigues(r2[i])
-        #     print('Ext1', ext1)
-        #     print('Ext2', ext2)
+        # d1 = d1.T[0]
+        # d2 = d2.T[0]
 
         # print('')
         camera_model = {
@@ -150,7 +164,20 @@ class StereoCalibration(object):
             'R': R,
             'T': T,
             'E': E,
-            'F': F
+            'F': F,
+            "objpts": objpoints,
+            "imgptsL": imgpoints_l,
+            "imgptsR": imgpoints_r,
         }
 
-        return ret, camera_model
+        sc = StereoCamera()
+        sc.R = R
+        sc.E = E
+        sc.F = F
+        sc.T = T
+        sc.K1 = K1
+        sc.K2 = K2
+        sc.d1 = d1
+        sc.d2 = d2
+
+        return ret, camera_model, sc
