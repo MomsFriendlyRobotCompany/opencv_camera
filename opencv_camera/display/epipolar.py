@@ -1,5 +1,12 @@
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2014 Kevin Walchko
+# see LICENSE for full details
+##############################################
+# -*- coding: utf-8 -*
 import cv2
 import numpy as np
+from ..color_space import gray2bgr
 
 def drawEpipolarLines(l, r, lines=True, thickness=1):
     """

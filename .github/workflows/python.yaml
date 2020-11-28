@@ -30,7 +30,7 @@ jobs:
             #     # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
             #     flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
             - name: Install Poetry
-              uses: dschep/install-poetry-action@v1.3
+              uses: snok/install-poetry@v1.1.1
               # with:
               #   version: 1.0.0b3
             - name: Turn off Virtualenvs

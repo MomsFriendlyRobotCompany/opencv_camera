@@ -1,3 +1,9 @@
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2014 Kevin Walchko
+# see LICENSE for full details
+##############################################
+# -*- coding: utf-8 -*
 import cv2
 import numpy as np
 
@@ -19,7 +25,7 @@ def stereoOverlay(imgL, imgR, xoffset, yoffset):
     return tmp
     # plt.imshow(tmp, cmap="gray")
 
-def coverage(self, size, imgpoints):
+def coverage(size, imgpoints):
     """
     Creates a  coverage map of detected points from calibration images. Ideally
     the entire image space should be evenly covered.

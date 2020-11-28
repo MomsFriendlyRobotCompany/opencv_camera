@@ -1,3 +1,9 @@
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2014 Kevin Walchko
+# see LICENSE for full details
+##############################################
+# -*- coding: utf-8 -*
 from opencv_camera.color_space import bgr2gray, gray2bgr
 
 
