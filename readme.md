@@ -16,6 +16,23 @@ The preferred way to install is using `pip`:
 pip install opencv_camera
 ```
 
+## Usage
+
+- `opencv_camera.color_space`:
+  - `bgr2gray(image)`
+  - `gray2bgr(image)`
+  - `bgr2rgb(image)`
+  - `rgb2bgr(image)`
+  - `bgr2hsv(image)`
+  - `hsv2bgr(image)`
+
+`opencv_camera.undistort`:
+
+```python
+un = UnDistort(cameraMatrix, distortionCoeff, w, h)
+corr_img = un.undistort(image)
+```
+
 ## Apps
 
 Use `program --help` to display switches for each of the following:
@@ -26,21 +43,31 @@ Use `program --help` to display switches for each of the following:
 - `udp_server x.x.x.x`: sends camera images via UDP
 - `udp_client x.x.x.x`: displays UDP camera images from server
 
+# ToDo
+
+- [ ] Reorganize better
+- [ ] Add in apriltag calibration
+- [ ] Add pointcloud from stereo 
+- [ ] Add parameters for known cameras
+- [ ] Better documentation
+- [ ] Simplify stereo camera
+
 # Change Log
 
 | Data       | Version| Notes                                     |
 |------------|--------|-------------------------------------------|
-| 2018-07-19 | 0.10.6 |  added UDP image server and client |
-| 2018-07-19 | 0.10.0 |  renamed and focused on camera |
-| 2018-07-19 |  0.9.4 |  simple clean-up and updating some things |
-| 2017-10-29 |  0.9.3 |  bug fixes |
-| 2017-04-09 |  0.9.0 |  initial python 3 support |
-| 2017-03-31 |  0.7.0 |  refactored and got rid of things I don't need |
-| 2017-01-29 |  0.6.0 |  added video capture (video and images) program |
-| 2016-12-30 |  0.5.3 |  typo fix |
-| 2016-12-30 |  0.5.1 |  refactored |
-| 2016-12-11 |  0.5.0 |  published to PyPi |
-| 2014-3-11  |  0.2.0 |  started |
+| 2018-07-19 | 0.10.8 |  |
+| 2018-07-19 | 0.10.6 | added UDP image server and client |
+| 2018-07-19 | 0.10.0 | renamed and focused on camera |
+| 2018-07-19 |  0.9.4 | simple clean-up and updating some things |
+| 2017-10-29 |  0.9.3 | bug fixes |
+| 2017-04-09 |  0.9.0 | initial python 3 support |
+| 2017-03-31 |  0.7.0 | refactored and got rid of things I don't need |
+| 2017-01-29 |  0.6.0 | added video capture (video and images) program |
+| 2016-12-30 |  0.5.3 | typo fix |
+| 2016-12-30 |  0.5.1 | refactored |
+| 2016-12-11 |  0.5.0 | published to PyPi |
+| 2014-3-11  |  0.2.0 | started |
 
 # MIT License
 
