@@ -29,10 +29,6 @@ jobs:
               with:
                 path: .venv
                 key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-              # with:
-              #   version: 1.0.0b3
-            # - name: Turn off Virtualenvs
-            #   run: poetry config virtualenvs.create false
             - name: Install packages
               run: poetry install
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -40,14 +36,3 @@ jobs:
               run: |
                 source .venv/bin/activate
                 pytest tests/
-            # - name: Run mypy
-            #   run: poetry run mypy pyservos
-            # - name: nosetests
-            #   run: |
-            #     pip install nose
-            #     cd python
-            #     python -m pip install -e .
-            #     cd tests
-            #     nosetests -vs test.py
-            # - name: Python Style Checker
-            #   uses: andymckay/pycodestyle-action@0.1.3
