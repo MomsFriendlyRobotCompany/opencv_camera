@@ -6,7 +6,7 @@
 
 [tool.poetry]
 name = "opencv_camera"
-version = "0.10.7"
+version = "0.10.8"
 description = "An OpenCV camera library"
 authors = ["walchko <walchko@users.noreply.github.com>"]
 readme = "readme.md"
