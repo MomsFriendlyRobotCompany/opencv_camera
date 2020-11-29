@@ -128,7 +128,7 @@ class ApriltagFinder:
         color_img: image to draw on, must be color
         corners: corner points from apriltag detector, v[0] is the
                  lower left of the tag and the point move CCW.
-        tag_id: display the tag's number ID
+        tag_id: display the tag's number ID, must be a valid integer number
         """
         pts = corners.reshape((-1,1,2)).astype('int32')
         cv2.polylines(color_img,[pts],True,(0,255,0),thickness=4)
