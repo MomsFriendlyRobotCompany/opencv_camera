@@ -25,16 +25,21 @@ import cv2
 import glob
 import argparse
 from opencv_camera import __version__ as VERSION
+import sys
 
-
+DESCRIPTION = """
+A simple program to calibrate a camera off line. Collect your images and pass
+them to this program to find the camera matrix.
+"""
 # set up and handle command line args
 def handleArgs():
-    parser = argparse.ArgumentParser(version=VERSION, description='A simple program to calibrate a camera')
+    parser = argparse.ArgumentParser(description=DESCRIPTION)
     parser.add_argument('-m', '--matrix', help='save calibration values', default='calibration.npy')
     parser.add_argument('-t', '--target', help='target type: chessboard or circles', default='chessboard')
     parser.add_argument('-s', '--target_size', type=int, nargs=2, help='size of pattern, for example, (6,7)', default=(11, 4))
-    parser.add_argument('-p', '--path', help='location of images to use', required=True)
+    parser.add_argument('path', help='location of captured images to use')
     parser.add_argument('-d', '--display', help='display images', default=True)
+    parser.add_argument('-v', '--version', help='version', action="version", version=f"{sys.argv[0]} version {VERSION}")
 
     args = vars(parser.parse_args())
     return args
@@ -43,6 +48,10 @@ def handleArgs():
 # main function
 def main():
     args = handleArgs()
+    # if args["version"]:
+    #     print(f"version {VERSION}")
+    #     return
+
     imgs_folder = args['path']
 
     print('Searching {0!s} for images'.format(imgs_folder))

@@ -15,7 +15,7 @@ import cv2
 import attr
 from .color_space import ColorSpace
 
-#                                   1   2   3   4
+#                                     1   2   3   4
 # ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
 
 @attr.s(slots=True)
@@ -36,12 +36,12 @@ class ThreadedCamera:
     c.close()               # stops internal loop and gathers back up the thread
     """
 
-    camera = attr.ib(default=None)
-    frame = attr.ib(default=None)
-    run = attr.ib(default=False)
-    thread_hz = attr.ib(default=30)
-    fmt = attr.ib(default=0)
-    ps = attr.ib(default=None)
+    camera = attr.ib(default=None)  # opencv camera object
+    frame = attr.ib(default=None)   # current frame
+    run = attr.ib(default=False)    # thread loop run parameter
+    thread_hz = attr.ib(default=30) # thread loop rate
+    fmt = attr.ib(default=0)        # colorspact format
+    ps = attr.ib(default=None)      # thread process
     # lock = attr.ib(default=Lock())
 
 
@@ -53,8 +53,21 @@ class ThreadedCamera:
         self.run = False
         time.sleep(0.25)
         self.camera.release()
-        self.join(0.1)
+        # self.join(0.1)
         # print('exiting CameraCV ... bye!')
+
+    def __colorspace(self):
+        s = "unknown"
+        if self.fmt == 1:
+            s = "BGR"
+        elif self.fmt == 2:
+            s = "RGB"
+        elif self.fmt == 4:
+            s = "HSV"
+        elif self.fmt == 8:
+            s = "GRAY"
+
+        return s
 
     def open(self, path=0, resolution=None, fmt=ColorSpace.bgr):
         """Starts the internal loop in a thread"""
@@ -62,7 +75,9 @@ class ThreadedCamera:
             resolution=(480,640,)
 
         if fmt not in list(ColorSpace):
-            raise Exception(f"Unknown color format: {fmt}")
+            print(f"{Fore.RED}*** Threaded Camera.Open: Unknown color format: {fmt} ***{Fore.RESET}")
+            fmt = 1
+
         self.fmt = fmt
 
         self.run = True
@@ -84,10 +99,16 @@ class ThreadedCamera:
         self.camera = cv2.VideoCapture(path)
         rate = Rate(self.thread_hz)
 
-        if isinstance(path, int):
-            rows, cols = resolution
-            self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
-            self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
+        # if isinstance(path, int):
+        rows, cols = resolution
+        self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
+        self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
+
+        print("========================")
+        print(f"Opened camera: {path}")
+        print(f"Resolution: {resolution}")
+        print(f"Colorspace: {self.__colorspace()}")
+        print("")
 
         while self.run:
             ok, img = self.camera.read()
@@ -97,26 +118,32 @@ class ThreadedCamera:
 
                 if self.fmt == ColorSpace.bgr:
                     self.frame = img.copy()
-                elif self.fmt == ColorSpace.rgb:
+                elif self.fmt == ColorSpace.hsv:
                     self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
                 elif self.fmt == ColorSpace.rgb:
                     self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 elif self.fmt == ColorSpace.gray:
                     self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 else:
-                    raise Exception(f"Invalide colorspace: {self.fmt}")
+                    print(f"{Fore.RED}*** Threaded Camera: Unknown color format: {self.fmt}, reset to BGR ***{Fore.RESET}")
+                    self.fmt = 1
 
                 # self.lock.release()
             rate.sleep()
 
         self.close()
 
-    def join(self, timeout=1.0):
-        """
-        Attempts to join() the process with the given timeout. If that fails, it calls
-        terminate().
-        timeout: how long to wait for join() in seconds.
-        """
-        if self.ps:
-            self.ps.join(timeout)
-        self.ps = None
+    # def stop(self):
+    #     self.run = False
+    #     time.sleep(0.2)
+    #     # self.ps.join()
+
+    # def join(self, timeout=1.0):
+    #     """
+    #     Attempts to join() the process with the given timeout. If that fails, it calls
+    #     terminate().
+    #     timeout: how long to wait for join() in seconds.
+    #     """
+    #     if self.ps:
+    #         self.ps.join(timeout)
+    #     self.ps = None

@@ -8,7 +8,7 @@ import cv2
 from enum import IntFlag
 
 
-#                                   1   2   3   4
+#                                   1   2   4   8
 ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
 
 bgr2rgb = lambda im: cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
