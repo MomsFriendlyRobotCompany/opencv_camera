@@ -16,7 +16,7 @@ import yaml
 import argparse
 # from opencvutils import CameraCV
 from opencv_camera import ThreadedCamera
-from opencv_camera import SaveVideo
+from opencv_camera.save_video import SaveVideo
 from opencv_camera import __version__ as VERSION
 from time import sleep
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     # cap = CameraCV()
     # cap.init(win=size, cameraNumber=source)
     cap = ThreadedCamera()
-    cap.open()
+    cap.open(path=args["camera"])
 
     print('---------------------------------')
     print(' ESC/q to quit')
