@@ -69,10 +69,20 @@ class ThreadedCamera:
 
         return s
 
+    def set_resolution(self, resolution):
+        rows, cols = resolution
+        self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
+        self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
+
+    def get(self):
+        cols = self.camera.get(3) #cv2.CAP_PROP_FRAME_WIDTH
+        rows = self.camera.get(4) #cv2.CAP_PROP_FRAME_HEIGHT
+        return (rows, cols,)
+
     def open(self, path=0, resolution=None, fmt=ColorSpace.bgr):
         """Starts the internal loop in a thread"""
-        if resolution is None:
-            resolution=(480,640,)
+        # if resolution is None:
+        #     resolution=(480,640,)
 
         if fmt not in list(ColorSpace):
             print(f"{Fore.RED}*** Threaded Camera.Open: Unknown color format: {fmt} ***{Fore.RESET}")
@@ -81,6 +91,14 @@ class ThreadedCamera:
         self.fmt = fmt
 
         self.run = True
+        self.camera = cv2.VideoCapture(path)
+        # _,_ = self.camera.read()
+        if resolution:
+            self.set_resolution(resolution)
+        # rows, cols = resolution
+        # self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
+        # self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
+
         self.ps = Thread(target=self.thread_func, args=(path, resolution))
         self.ps.daemon = True
         self.ps.start()
@@ -96,13 +114,13 @@ class ThreadedCamera:
     def thread_func(self, path, resolution):
         """Internal function, do not call"""
 
-        self.camera = cv2.VideoCapture(path)
+        # self.camera = cv2.VideoCapture(path)
         rate = Rate(self.thread_hz)
 
         # if isinstance(path, int):
-        rows, cols = resolution
-        self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
-        self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
+        # rows, cols = resolution
+        # self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
+        # self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
 
         print("========================")
         print(f"Opened camera: {path}")
