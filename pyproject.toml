@@ -6,7 +6,7 @@
 
 [tool.poetry]
 name = "opencv_camera"
-version = "0.10.9"
+version = "0.10.10"
 description = "An OpenCV camera library"
 authors = ["walchko <walchko@users.noreply.github.com>"]
 readme = "readme.md"
@@ -48,10 +48,6 @@ importlib-metadata = {version="*", python="<3.8"}
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
-# mypy = "*"
-
-# [mypy-pi_servo_serial]
-# ignore_missing_imports = True
 
 [build-system]
 requires = ["poetry>=0.12"]

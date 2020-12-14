@@ -6,17 +6,22 @@
 # -*- coding: utf-8 -*
 # import cv2
 # import numpy as np
+import attr
 
 
+@attr.s(slots=True)
 class StereoCamera:
-    R = None
-    F = None
-    E = None
-    T = None
-    K1 = None
-    K2 = None
-    d1 = None
-    d2 = None
+    """
+    Nice class for holding stereo camera info
+    """
+    R = attr.ib(default=None)
+    F = attr.ib(default=None)
+    E = attr.ib(default=None)
+    T = attr.ib(default=None)
+    K1 = attr.ib(default=None)
+    K2 = attr.ib(default=None)
+    d1 = attr.ib(default=None)
+    d2 = attr.ib(default=None)
 
     def __str__(self):
         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))

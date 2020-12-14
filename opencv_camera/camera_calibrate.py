@@ -8,11 +8,7 @@ import numpy as np
 np.set_printoptions(precision=1)
 np.set_printoptions(suppress=True)
 import cv2
-# from glob import glob
-# import yaml
-# import json
 import attr
-# from enum import Enum
 import time
 from collections import namedtuple
 from .undistort import DistortionCoefficients
