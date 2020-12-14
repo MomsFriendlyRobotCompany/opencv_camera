@@ -22,37 +22,7 @@ from .camera_calibrate import CameraCalibration
 from .stereo_camera import StereoCamera
 
 
-# class StereoCamera:
-#     R = None
-#     F = None
-#     E = None
-#     T = None
-#     K1 = None
-#     K2 = None
-#     d1 = None
-#     d2 = None
-#
-#     def __str__(self):
-#         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))
-#         s = f'{Fore.BLUE}Camera 1 --------------------------\n'
-#         s += f'  focalLength(x,y): {self.K1[0,0]:.1f} {self.K1[1,1]:.1f} px \n'
-#         s += f'  principlePoint(x,y): {self.K1[0,2]:.1f} {self.K1[1,2]:.1f} px\n'
-#         s += f'  distortionCoeffs: {self.d1}\n'
-#
-#         s += f'{Fore.GREEN}Camera 2 --------------------------\n'
-#         s += f'  focalLength(x,y): {self.K2[0,0]:.1f} {self.K2[1,1]:.1f} px \n'
-#         s += f'  principlePoint(x,y): {self.K2[0,2]:.1f} {self.K2[1,2]:.1f} px\n'
-#         s += f'  distortionCoeffs: {self.d2}\n'
-#
-#         s += f"{Fore.MAGENTA}"
-#         s += 'Extrinsic Camera Parameters -------\n'
-#         s += f"  Translation between Left/Right Camera: {self.T.T[0]}\n"
-#         s += f"  Rotation between Left/Right Camera:\n{ms(self.R)}\n"
-#         s += f"  Essential Matrix:\n{ms(self.E)}\n"
-#         s += f'  Fundatmental Matrix:\n{ms(self.F)}\n'
-#         s += f"{Fore.RESET}"
-#         return s
-#
+
 
 class StereoCalibration(object):
     def __init__(self, R=None, t=None):
