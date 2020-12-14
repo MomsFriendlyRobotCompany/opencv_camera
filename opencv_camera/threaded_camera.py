@@ -46,15 +46,12 @@ class ThreadedCamera:
 
 
     def __del__(self):
-        # self.run = False
         self.close()
 
     def close(self):
         self.run = False
         time.sleep(0.25)
         self.camera.release()
-        # self.join(0.1)
-        # print('exiting CameraCV ... bye!')
 
     def __colorspace(self):
         s = "unknown"
@@ -74,30 +71,32 @@ class ThreadedCamera:
         self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
         self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
 
-    def get(self):
+    def get_resolution(self):
         cols = self.camera.get(3) #cv2.CAP_PROP_FRAME_WIDTH
         rows = self.camera.get(4) #cv2.CAP_PROP_FRAME_HEIGHT
         return (rows, cols,)
 
     def open(self, path=0, resolution=None, fmt=ColorSpace.bgr):
-        """Starts the internal loop in a thread"""
-        # if resolution is None:
-        #     resolution=(480,640,)
+        """
+        Opens the camera object and starts the internal loop in a thread
+        """
 
         if fmt not in list(ColorSpace):
             print(f"{Fore.RED}*** Threaded Camera.Open: Unknown color format: {fmt} ***{Fore.RESET}")
             fmt = 1
-
         self.fmt = fmt
 
         self.run = True
         self.camera = cv2.VideoCapture(path)
-        # _,_ = self.camera.read()
+
         if resolution:
             self.set_resolution(resolution)
-        # rows, cols = resolution
-        # self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
-        # self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
+
+        print("========================")
+        print(f"Opened camera: {path}")
+        print(f"Resolution: {resolution}")
+        print(f"Colorspace: {self.__colorspace()}")
+        print("")
 
         self.ps = Thread(target=self.thread_func, args=(path, resolution))
         self.ps.daemon = True
@@ -114,19 +113,7 @@ class ThreadedCamera:
     def thread_func(self, path, resolution):
         """Internal function, do not call"""
 
-        # self.camera = cv2.VideoCapture(path)
         rate = Rate(self.thread_hz)
-
-        # if isinstance(path, int):
-        # rows, cols = resolution
-        # self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
-        # self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
-
-        print("========================")
-        print(f"Opened camera: {path}")
-        print(f"Resolution: {resolution}")
-        print(f"Colorspace: {self.__colorspace()}")
-        print("")
 
         while self.run:
             ok, img = self.camera.read()
@@ -146,22 +133,4 @@ class ThreadedCamera:
                     print(f"{Fore.RED}*** Threaded Camera: Unknown color format: {self.fmt}, reset to BGR ***{Fore.RESET}")
                     self.fmt = 1
 
-                # self.lock.release()
             rate.sleep()
-
-        self.close()
-
-    # def stop(self):
-    #     self.run = False
-    #     time.sleep(0.2)
-    #     # self.ps.join()
-
-    # def join(self, timeout=1.0):
-    #     """
-    #     Attempts to join() the process with the given timeout. If that fails, it calls
-    #     terminate().
-    #     timeout: how long to wait for join() in seconds.
-    #     """
-    #     if self.ps:
-    #         self.ps.join(timeout)
-    #     self.ps = None
