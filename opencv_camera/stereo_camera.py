@@ -7,6 +7,7 @@
 # import cv2
 # import numpy as np
 import attr
+from colorama import Fore
 
 
 @attr.s(slots=True)
