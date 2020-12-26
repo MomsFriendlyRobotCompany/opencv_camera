@@ -5,6 +5,7 @@
 [![Latest Version](https://img.shields.io/pypi/v/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera/)
 [![image](https://img.shields.io/pypi/pyversions/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera)
 [![image](https://img.shields.io/pypi/format/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/opencv_camera?color=aqua)
 
 Simple threaded camera and calibration code.
 
