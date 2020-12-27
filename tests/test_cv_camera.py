@@ -53,7 +53,7 @@ def test_checkerboard_calibrate():
     board = ChessboardFinder((9,6), 1)
 
     cal = CameraCalibration()
-    data = cal.calibrate(imgs, board)
+    cam, data = cal.calibrate(imgs, board)
     assert (data['rms'] - 0.5882563398961391) < 1e-6
 
     print("camera matrix\n",data["cameraMatrix"],"\n")
