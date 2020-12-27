@@ -29,6 +29,9 @@ def visualizeDistortion(K, D, h, w, fontsize=16, contourLevels=10):
     # * tilted distortion     : taux, tauy (ignored here)
     #
     D = D.ravel()
+    d = np.zeros(14)
+    d[:D.size] = D
+    D = d
     k1 = D[0]
     k2 = D[1]
     p1 = D[2]
@@ -55,9 +58,9 @@ def visualizeDistortion(K, D, h, w, fontsize=16, contourLevels=10):
     r4 = r2**2
     r6 = r2**3
 
-    coef = 1 + k1*r2 + k2*r4 + k3*r6
-    xpp = xp*coef + 2*p1*(xp*yp) + p2*(r2+2*xp**2)
-    ypp = yp*coef + p1*(r2+2*yp**2) + 2*p2*(xp*yp)
+    coef = (1 + k1*r2 + k2*r4 + k3*r6) / (1 + D[5]*r2 + D[6]*r4 + D[7]*r6)
+    xpp = xp*coef + 2*p1*(xp*yp) + p2*(r2+2*xp**2) + D[8]*r2 + D[9]*r4
+    ypp = yp*coef + p1*(r2+2*yp**2) + 2*p2*(xp*yp) + D[11]*r2 + D[11]*r4
     u2 = M[0,0]*xpp + M[0,2]
     v2 = M[1,1]*ypp + M[1,2]
     du = u2.ravel() - u.ravel()
