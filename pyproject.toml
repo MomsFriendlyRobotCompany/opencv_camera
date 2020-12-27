@@ -45,6 +45,7 @@ opencv_python = "*"
 slurm = "*"
 numpy_camera = "*"
 matplotlib = "*"
+tqdm = "*"
 importlib-metadata = {version="*", python="<3.8"}
 
 [tool.poetry.dev-dependencies]
