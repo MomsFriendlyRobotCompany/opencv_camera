@@ -4,7 +4,7 @@ from opencv_camera.targets.chessboard import ChessboardFinder
 # from opencv_camera import Markers
 # from opencv_camera import FlipBook
 from opencv_camera import UnDistort
-from opencv_camera.save_video import SaveVideo
+from opencv_camera.save.video import SaveVideo
 from opencv_camera.color_space import bgr2gray, gray2bgr
 # from glob import glob
 import opencv_camera
