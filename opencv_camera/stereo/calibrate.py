@@ -16,10 +16,11 @@ from colorama import Fore
 # from enum import Enum
 import time
 # from collections import namedtuple
-from .undistort import DistortionCoefficients
-from .color_space import bgr2gray, gray2bgr
-from .camera_calibrate import CameraCalibration
-from .stereo_camera import StereoCamera
+from ..undistort import DistortionCoefficients
+from ..color_space import bgr2gray, gray2bgr
+from ..mono.calibrate import CameraCalibration
+from ..mono.camera import Camera
+from .camera import StereoCamera
 
 
 
@@ -67,15 +68,15 @@ class StereoCalibration(object):
         # rms1, M1, d1, r1, t1, objpoints, imgpoints_l = cc.calibrate(imgs_l, board)
         # rms2, M2, d2, r2, t2, objpoints, imgpoints_r = cc.calibrate(imgs_r, board)
 
-        data = cc.calibrate(imgs_l, board)
-        K1 = data["cameraMatrix"]
-        d1 = data["distCoeffs"]
+        cam, data = cc.calibrate(imgs_l, board)
+        K1 = cam.K
+        d1 = cam.d
         objpoints = data["objpoints"]
         imgpoints_l =  data["imgpoints"]
 
-        data = cc.calibrate(imgs_r, board)
-        K2 = data["cameraMatrix"]
-        d2 = data["distCoeffs"]
+        cam, data = cc.calibrate(imgs_r, board)
+        K2 = cam.K
+        d2 = cam.d
         imgpoints_r =  data["imgpoints"]
 
         print(d1,d2)

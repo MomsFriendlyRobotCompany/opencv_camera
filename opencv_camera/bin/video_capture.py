@@ -16,7 +16,7 @@ import yaml
 import argparse
 # from opencvutils import CameraCV
 from opencv_camera import ThreadedCamera
-from opencv_camera.save_video import SaveVideo
+from opencv_camera.save.video import SaveVideo
 from opencv_camera import __version__ as VERSION
 from time import sleep
 import sys

@@ -15,13 +15,13 @@ class StereoCamera:
     """
     Nice class for holding stereo camera info
     """
-    R = attr.ib(default=None)
-    F = attr.ib(default=None)
-    E = attr.ib(default=None)
-    T = attr.ib(default=None)
-    K1 = attr.ib(default=None)
-    K2 = attr.ib(default=None)
-    d1 = attr.ib(default=None)
+    R = attr.ib(default=None) # between cameras
+    F = attr.ib(default=None) # fundamental matrix
+    E = attr.ib(default=None) # essential matrix
+    T = attr.ib(default=None) # between cameras
+    K1 = attr.ib(default=None) # left camera matrix
+    K2 = attr.ib(default=None) # right camera matrix
+    d1 = attr.ib(default=None) # left distortion coefficients
     d2 = attr.ib(default=None)
 
     def __str__(self):

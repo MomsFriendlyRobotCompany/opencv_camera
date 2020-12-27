@@ -5,52 +5,47 @@
 ##############################################
 # -*- coding: utf-8 -*
 import numpy as np
-np.set_printoptions(precision=1)
+np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 import cv2
 import attr
 import time
 from collections import namedtuple
-from .undistort import DistortionCoefficients
-from .color_space import bgr2gray, gray2bgr
+from ..undistort import DistortionCoefficients
+from ..color_space import bgr2gray, gray2bgr
+from .camera import Camera
+from tqdm import tqdm
 # from .targets/chessboard import ChessboardFinder
 
 # DistortionCoefficients = namedtuple("DistortionCoefficients", "k1 k2 p1 p2 k3")
 # Markers = Enum('Markers', 'checkerboard circle acircle apriltag')
 
 
-def calculateReprojectionError(imgpoints, objpoints, rvecs, tvecs, mtx, dist):
+def computeReprojectionErrors(imgpoints, objpoints, rvecs, tvecs, K, D):
     """
-    imgpts: features found in image, (num_imgs, 2)
-    objpts: calibration known features in 3d, (num_imgs, 3)
+    Uses the camera matrix (K) and the distortion coefficients to reproject the
+    object points back into 3D camera space and then calculate the error between
+    them and the image points that were found.
+
+    Reference: https://docs.opencv.org/master/dc/dbb/tutorial_py_calibration.html
+
+    imgpoints: features found in image, (num_imgs, 2)
+    objpoints: calibration known features in 3d, (num_imgs, 3)
     rvecs: rotations
     tvecs: translations
-    mtx: camera matrix
-    dist: distortion coefficients [k1,k2,p1,p2,k3]
+    K: camera matrix
+    D: distortion coefficients [k1,k2,p1,p2,k3]
 
     returns:
-        mean_error, x_error[list], y_error[list]
+        mean_error
     """
-    imgpoints = [c.reshape(-1,2) for c in imgpoints]
     mean_error = 0
-    error_x = []
-    error_y = []
     for i in range(len(objpoints)):
-        imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
-        imgpoints2 = imgpoints2.reshape(-1,2)
-
-        # if not all markers were found, then the norm below will fail
-        if len(imgpoints[i]) != len(imgpoints2):
-            continue
-
-        error_x += list(imgpoints2[:,0] - imgpoints[i][:,0])
-        error_y += list(imgpoints2[:,1] - imgpoints[i][:,1])
-
-        error = cv2.norm(imgpoints[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
+        imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], K, D)
+        error = cv2.norm(imgpoints[i], imgpoints2, cv.NORM_L2)/len(imgpoints2)
         mean_error += error
-
-    m_error = mean_error/len(objpoints)
-    return m_error, error_x, error_y
+    mean_error = mean_error/len(objpoints)
+    return mean_error
 
 
 # @attr.s(slots=True)
@@ -67,42 +62,43 @@ class CameraCalibration:
 
     save_cal_imgs = None
 
-    def calculateReprojectionError(self, imgpoints, objpoints, rvecs, tvecs, mtx, dist):
-        """
-        imgpts: features found in image, (num_imgs, 2)
-        objpts: calibration known features in 3d, (num_imgs, 3)
-        rvecs: rotations
-        tvecs: translations
-        mtx: camera matrix
-        dist: distortion coefficients [k1,k2,p1,p2,k3]
-
-        returns:
-            mean_error, x_error[list], y_error[list]
-        """
-        imgpoints = [c.reshape(-1,2) for c in imgpoints]
-        mean_error = 0
-        error_x = []
-        error_y = []
-        for i in range(len(objpoints)):
-            imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
-            imgpoints2 = imgpoints2.reshape(-1,2)
-
-            # if not all markers were found, then the norm below will fail
-            if len(imgpoints[i]) != len(imgpoints2):
-                continue
-
-            error_x += list(imgpoints2[:,0] - imgpoints[i][:,0])
-            error_y += list(imgpoints2[:,1] - imgpoints[i][:,1])
-
-            error = cv2.norm(imgpoints[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
-            mean_error += error
-
-        m_error = mean_error/len(objpoints)
-        return m_error, error_x, error_y
+    # def calculateReprojectionError(self, imgpoints, objpoints, rvecs, tvecs, mtx, dist):
+    #     """
+    #     imgpts: features found in image, (num_imgs, 2)
+    #     objpts: calibration known features in 3d, (num_imgs, 3)
+    #     rvecs: rotations
+    #     tvecs: translations
+    #     mtx: camera matrix
+    #     dist: distortion coefficients [k1,k2,p1,p2,k3]
+    #
+    #     returns:
+    #         mean_error, x_error[list], y_error[list]
+    #     """
+    #     imgpoints = [c.reshape(-1,2) for c in imgpoints]
+    #     mean_error = 0
+    #     error_x = []
+    #     error_y = []
+    #     for i in range(len(objpoints)):
+    #         imgpoints2, _ = cv2.projectPoints(objpoints[i], rvecs[i], tvecs[i], mtx, dist)
+    #         imgpoints2 = imgpoints2.reshape(-1,2)
+    #
+    #         # if not all markers were found, then the norm below will fail
+    #         if len(imgpoints[i]) != len(imgpoints2):
+    #             continue
+    #
+    #         error_x += list(imgpoints2[:,0] - imgpoints[i][:,0])
+    #         error_y += list(imgpoints2[:,1] - imgpoints[i][:,1])
+    #
+    #         error = cv2.norm(imgpoints[i], imgpoints2, cv2.NORM_L2)/len(imgpoints2)
+    #         mean_error += error
+    #
+    #     m_error = mean_error/len(objpoints)
+    #     return m_error, error_x, error_y
 
     def calibrate(self, images, board):
         """
-        images: an array of grayscale images, all assumed to be the same size
+        images: an array of grayscale images, all assumed to be the same size.
+            If images are not grayscale, then assumed to be in BGR format.
         board: an object that represents your target, i.e., Chessboard
         marker_scale: how big are your markers in the real world, example:
             checkerboard with sides 2 cm, set marker_scale=0.02 so your T matrix
@@ -116,11 +112,11 @@ class CameraCalibration:
 
         max_corners = board.marker_size[0]*board.marker_size[1]
 
-        print("Images: {} @ {}".format(len(images), images[0].shape))
-        print("{} {}".format(board.type, board.marker_size))
-        print('-'*40)
-        for cnt, gray in enumerate(images):
-            # orig = gray.copy()
+        # print("Images: {} @ {}".format(len(images), images[0].shape))
+        # print("{} {}".format(board.type, board.marker_size))
+        # print('-'*40)
+        # cnt = 0
+        for cnt, gray in enumerate(tqdm(images)):
             if len(gray.shape) > 2:
                 gray = bgr2gray(gray)
 
@@ -135,8 +131,8 @@ class CameraCalibration:
                 objp = board.objectPoints()
                 objpoints.append(objp)
 
-                print('[{}] + found {} of {} corners'.format(
-                    cnt, corners.size / 2, max_corners))
+                # print('[{}] + found {} of {} corners'.format(
+                #     cnt, corners.size / 2, max_corners))
                 term = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 30, 0.001)
                 cv2.cornerSubPix(gray, corners, (5, 5), (-1, -1), term)
 
@@ -146,7 +142,7 @@ class CameraCalibration:
                 tmp = board.draw(gray, corners)
                 self.save_cal_imgs.append(tmp)
             else:
-                print(f'[{cnt}] - Could not find markers')
+                print(f'{Fore.RED}*** Image[{cnt}] - Could not find markers ***{Fore.RESET}')
 
         # images size here is backwards: w,h
         h, w = images[0].shape[:2]
@@ -162,8 +158,8 @@ class CameraCalibration:
         ])
         rms, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
             objpoints, imgpoints, (w, h), K, None)
-        print(f"\nRMS error: {rms}\n")
-        print('-'*40)
+        # print(f"\nRMS error: {rms}\n")
+        # print('-'*40)
 
         # print(f"rvecs: {rvecs}    tvecs: {tvecs}")
         # print(f"dist: {dist}")
@@ -174,8 +170,8 @@ class CameraCalibration:
             'markerType': board.type,
             'markerSize': board.marker_size,
             'imageSize': images[0].shape,
-            'cameraMatrix': mtx,
-            'distCoeffs': dist, #DistortionCoefficients(dist),
+            'K': mtx,
+            'd': dist, #DistortionCoefficients(dist),
             'rms': rms,
             'rvecs': rvecs,
             'tvecs': tvecs,
@@ -183,4 +179,6 @@ class CameraCalibration:
             "imgpoints": imgpoints
         }
 
-        return data
+        cam = Camera(mtx, dist, images[0].shape[:2])
+
+        return cam, data

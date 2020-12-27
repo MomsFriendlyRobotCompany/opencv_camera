@@ -6,7 +6,7 @@
 
 [tool.poetry]
 name = "opencv_camera"
-version = "0.10.10"
+version = "0.10.11"
 description = "An OpenCV camera library"
 authors = ["walchko <walchko@users.noreply.github.com>"]
 readme = "readme.md"
@@ -44,6 +44,7 @@ pyyaml = "*"
 opencv_python = "*"
 slurm = "*"
 numpy_camera = "*"
+matplotlib = "*"
 importlib-metadata = {version="*", python="<3.8"}
 
 [tool.poetry.dev-dependencies]

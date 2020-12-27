@@ -36,7 +36,7 @@ def coverage(size, imgpoints):
     Returns: a numpy image
     """
     y,x = size #imgs[0].shape[:2]
-    tgt = np.zeros((y,x,3),dtype=np.uint8)
+    tgt = 255*np.ones((y,x,3),dtype=np.uint8)
 
     rad = 5*max(int(y/1000),1)
     c = (0,0,255)
@@ -47,8 +47,12 @@ def coverage(size, imgpoints):
     return tgt
 
 def tip_sheet(imgs, width=5, scale=None):
+    raise DeprecationWarning("Use mosaic instead")
+    return mosaic(imgs, width, scale)
+
+def mosaic(imgs, width=5, scale=None):
     """
-    Creates a single image (tip sheet) with thumb nails of
+    Creates a single image (mosaic) with thumb nails of
     the input images. Useful for displaying a batch of calibration
     images.
 

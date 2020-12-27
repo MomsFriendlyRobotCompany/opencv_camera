@@ -19,6 +19,8 @@ pip install opencv_camera
 
 ## Usage
 
+### Colorspace
+
 - `opencv_camera.color_space`:
   - `bgr2gray(image)`
   - `gray2bgr(image)`
@@ -27,12 +29,43 @@ pip install opencv_camera
   - `bgr2hsv(image)`
   - `hsv2bgr(image)`
 
-`opencv_camera.undistort`:
+### Calibration
+
+Create a mosaic with `mosaic(images, width)`
+
+![](pics/mosaic.png)
+
+Calibrate a camera with:
+
+```python
+calibrator = CameraCalibration()
+board = ChessboardFinder((9,6), 1)
+cam, cal = calibrator.calibrate(images, board)
+```
+
+Display all of the found image points with `coverage((width, height), imagePoints)`
+
+![](pics/target-points.png)
+
+### Distortion
 
 ```python
 un = UnDistort(cameraMatrix, distortionCoeff, w, h)
 corr_img = un.undistort(image)
 ```
+
+```python
+visualizeDistortion(cameraMatrix, distortCoeff, height, width)
+```
+
+![](pics/py-dist.png)
+
+### Stereo
+
+Draw epipolar lines in stereo images with `drawEpipolarLines(imgpointsL,imgpointsR,imgL,imgR)`
+
+![](pics/epipolar.png)
+
 
 ## Apps
 
@@ -48,16 +81,19 @@ Use `program --help` to display switches for each of the following:
 
 - [ ] Reorganize better
 - [ ] Add in apriltag calibration
-- [ ] Add pointcloud from stereo 
-- [ ] Add parameters for known cameras
+- [ ] Add pointcloud from stereo
+- [x] Add parameters for known cameras
 - [ ] Better documentation
-- [ ] Simplify stereo camera
+- [x] Simplify stereo camera
+- [ ] Add `computeReprojectionErrors` and `visualizeReprojErrors`
+- [x] Add `visualizeDistortion`
+- [ ] Add `visualizeExtrinsics`
 
 # Change Log
 
-| Data       | Version| Notes                                     |
-|------------|--------|-------------------------------------------|
-| 2018-07-19 | 0.10.8 |  |
+| Data       | Version | Notes                                     |
+|------------|---------|-------------------------------------------|
+| 2018-07-19 | 0.10.11 | added distortion |
 | 2018-07-19 | 0.10.6 | added UDP image server and client |
 | 2018-07-19 | 0.10.0 | renamed and focused on camera |
 | 2018-07-19 |  0.9.4 | simple clean-up and updating some things |
