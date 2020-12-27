@@ -30,10 +30,12 @@ jobs:
                 path: .venv
                 key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
             - name: Install packages
-              run: poetry install
+              run: |
+                source .venv/bin/activate
+                poetry install
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
             - name: Run PyTest
               run: |
-                pip list
                 source .venv/bin/activate
+                pip list
                 pytest tests/
