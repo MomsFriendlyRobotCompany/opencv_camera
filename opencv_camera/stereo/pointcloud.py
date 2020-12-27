@@ -6,6 +6,7 @@
 # -*- coding: utf-8 -*
 import cv2
 import numpy as np
+from ..save.pointcloud import PLY
 
 
 class Stereo2PointCloud:
@@ -106,11 +107,11 @@ end_header
 '''
 
 
-class PLY:
-    def write(self, fn, verts, colors):
-        verts = verts.reshape(-1, 3)
-        colors = colors.reshape(-1, 3)
-        verts = np.hstack([verts, colors])
-        with open(fn, 'w') as f:
-            f.write(ply_header % dict(vert_num=len(verts)))
-            np.savetxt(f, verts, '%f %f %f %d %d %d')
+# class PLY:
+#     def write(self, fn, verts, colors):
+#         verts = verts.reshape(-1, 3)
+#         colors = colors.reshape(-1, 3)
+#         verts = np.hstack([verts, colors])
+#         with open(fn, 'w') as f:
+#             f.write(ply_header % dict(vert_num=len(verts)))
+#             np.savetxt(f, verts, '%f %f %f %d %d %d')

@@ -71,12 +71,16 @@ class StereoCalibration(object):
         cam, data = cc.calibrate(imgs_l, board)
         K1 = cam.K
         d1 = cam.d
+        rvecs1 = data["rvecs"]
+        tvecs1 = data["tvecs"]
         objpoints = data["objpoints"]
         imgpoints_l =  data["imgpoints"]
 
         cam, data = cc.calibrate(imgs_r, board)
         K2 = cam.K
         d2 = cam.d
+        rvecs2 = data["rvecs"]
+        tvecs2 = data["tvecs"]
         imgpoints_r =  data["imgpoints"]
 
         print(d1,d2)
@@ -131,8 +135,10 @@ class StereoCalibration(object):
             # 'cameraMatrix2': K2,
             # 'distCoeffs1': d1,
             # 'distCoeffs2': d2,
-            # 'rvecs1': r1,
-            # 'rvecs2': r2,
+            'rvecsL': rvecs1,
+            "tvecsL": tvecs1,
+            'rvecsR': rvecs2,
+            "tvecsR": tvecs2,
             # 'R': R,
             # 'T': T,
             # 'E': E,

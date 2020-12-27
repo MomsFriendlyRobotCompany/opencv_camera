@@ -16,6 +16,9 @@ from .stereo.fundamental_matrix import findFundamentalMat
 from .undistort import UnDistort
 from .distortion import visualizeDistortion
 
+from .reproject import computeReprojectionErrors
+from .reproject import visualizeReprojErrors
+
 from .display.lines import drawHorizontalLines
 from .display.lines import drawEpipolarLines
 from .display.stereo import mosaic

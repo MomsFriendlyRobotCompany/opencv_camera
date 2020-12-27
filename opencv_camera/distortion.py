@@ -1,3 +1,9 @@
+##############################################
+# The MIT License (MIT)
+# Copyright (c) 2014 Kevin Walchko
+# see LICENSE for full details
+##############################################
+# -*- coding: utf-8 -*
 from numpy.linalg import lstsq
 import numpy as np
 import matplotlib.pyplot as plt

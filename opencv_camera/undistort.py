@@ -86,8 +86,8 @@ class UnDistort:
             self.mapx, self.mapy = cv2.initUndistortRectifyMap(K,d,R,nK,(w,h),cv2.CV_32FC1)
         return cv2.remap(image,self.mapx,self.mapy,cv2.INTER_LINEAR)
 
-    def distortionMap(self):
-        """
-        Return a numpy array representing the image distortion
-        """
-        raise NotImplemented()
+    # def distortionMap(self):
+    #     """
+    #     Return a numpy array representing the image distortion
+    #     """
+    #     raise NotImplemented()

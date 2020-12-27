@@ -91,13 +91,12 @@ Use `program --help` to display switches for each of the following:
 
 # ToDo
 
-- [ ] Reorganize better
 - [ ] Add in `apriltag` calibration
 - [ ] Add pointcloud from stereo
 - [x] Add parameters for known cameras
-- [ ] Better documentation
+- [ ] Add Jupyter notebook documentation and examples
 - [x] Simplify stereo camera
-- [ ] Add `computeReprojectionErrors` and `visualizeReprojErrors`
+- [x] Add `computeReprojectionErrors` and `visualizeReprojErrors`
 - [x] Add `visualizeDistortion`
 - [ ] Add `visualizeExtrinsics`
 
@@ -105,9 +104,10 @@ Use `program --help` to display switches for each of the following:
 
 | Data       | Version | Notes                                     |
 |------------|---------|-------------------------------------------|
-| 2018-07-19 | 0.10.11 | added distortion and general cleanup |
-| 2018-07-19 | 0.10.6 | added UDP image server and client |
-| 2018-07-19 | 0.10.0 | renamed and focused on camera |
+| 2020-12-27 | 0.10.10 | added distortion and reprojection display |
+| 2020-09-15 | 0.10.8 | added known camera params and general cleanup |
+| 2020-08-24 | 0.10.6 | added UDP image server and client |
+| 2020-07-03 | 0.10.2 | renamed and focused on camera |
 | 2018-07-19 |  0.9.4 | simple clean-up and updating some things |
 | 2017-10-29 |  0.9.3 | bug fixes |
 | 2017-04-09 |  0.9.0 | initial python 3 support |
