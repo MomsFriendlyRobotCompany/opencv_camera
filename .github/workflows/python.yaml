@@ -8,7 +8,7 @@ jobs:
           max-parallel: 5
           fail-fast: true
           matrix:
-            python-version: [3.6, 3.7, 3.8, 3.9]
+            python-version: [3.6] #, 3.7, 3.8, 3.9]
         steps:
             - uses: actions/checkout@master
             - name: Setup Python ${{ matrix.python-version }}
@@ -25,15 +25,21 @@ jobs:
               #----------------------------------------------
             - name: Load cached venv
               id: cached-poetry-dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@master
               with:
                 path: .venv
                 key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
             - name: Install packages
               run: |
+                echo "Installing dependencies"
                 source .venv/bin/activate
                 poetry install
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+            - name: Show Module Info
+              run: |
+                pwd
+                ls -al
+                pip show opencv_camera
             - name: Run PyTest
               run: |
                 source .venv/bin/activate
