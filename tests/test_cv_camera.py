@@ -1,12 +1,10 @@
 
 from opencv_camera import CameraCalibration
 from opencv_camera import ChessboardFinder
-# from opencv_camera import Markers
 # from opencv_camera import FlipBook
 from opencv_camera import UnDistort
 from opencv_camera import SaveVideo
 from opencv_camera import bgr2gray, gray2bgr
-# from glob import glob
 import opencv_camera
 import slurm
 import cv2
@@ -56,8 +54,8 @@ def test_checkerboard_calibrate():
     cam, data = cal.calibrate(imgs, board)
     assert (data['rms'] - 0.5882563398961391) < 1e-6
 
-    print("camera matrix\n",data["cameraMatrix"],"\n")
-    print("distortion coeff:",data["distCoeffs"],"\n")
+    print("camera matrix\n",data["K"],"\n")
+    print("distortion coeff:",data["d"],"\n")
     # print("rms error:",data["rms"],"\n")
 
     # fb = FlipBook(cal.save_cal_imgs)
