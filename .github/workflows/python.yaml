@@ -38,8 +38,7 @@ jobs:
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
             - name: Show Module Info
               run: |
-                pwd
-                ls -al
+                source .venv/bin/activate
                 pip show opencv_camera
             - name: Run PyTest
               run: |
