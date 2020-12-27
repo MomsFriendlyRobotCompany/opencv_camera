@@ -34,5 +34,6 @@ jobs:
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
             - name: Run PyTest
               run: |
+                pip list
                 source .venv/bin/activate
                 pytest tests/
