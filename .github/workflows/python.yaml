@@ -33,6 +33,8 @@ jobs:
               run: |
                 echo "Installing dependencies"
                 poetry install
+                source .venv/bin/activate
+                pip install -U pip setuptools wheel
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
             - name: Show Module Info
               run: |

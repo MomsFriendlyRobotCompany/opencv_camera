@@ -14,7 +14,7 @@ license = "MIT"
 homepage = "https://pypi.org/project/opencv_camera/"
 repository = 'https://github.com/MomsFriendlyRobotCompany/opencv_camera'
 # documentation = "http://..."
-keywords = ['computer vision', 'camera', "calibration", 'opencv']
+keywords = ['computer vision', 'camera', "calibration", 'opencv', "jupyter"]
 # https://pypi.org/classifiers/
 classifiers = [
     'Development Status :: 4 - Beta',
