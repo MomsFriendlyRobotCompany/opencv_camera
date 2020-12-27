@@ -7,7 +7,7 @@
 [![image](https://img.shields.io/pypi/format/opencv_camera.svg)](https://pypi.python.org/pypi/opencv_camera)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/opencv_camera?color=aqua)
 
-Simple threaded camera and calibration code.
+Simple threaded camera and calibration code using OpenCV. This tries to simplify some things
 
 ## Install
 
@@ -21,19 +21,20 @@ pip install opencv_camera
 
 ### Colorspace
 
-- `opencv_camera.color_space`:
-  - `bgr2gray(image)`
-  - `gray2bgr(image)`
-  - `bgr2rgb(image)`
-  - `rgb2bgr(image)`
-  - `bgr2hsv(image)`
-  - `hsv2bgr(image)`
+Change between common colorspaces with:
+
+- `bgr2gray(image)`
+- `gray2bgr(image)`
+- `bgr2rgb(image)`
+- `rgb2bgr(image)`
+- `bgr2hsv(image)`
+- `hsv2bgr(image)`
 
 ### Calibration
 
-Create a mosaic with `mosaic(images, width)`
+Create a mosaic of input calibration images with `mosaic(images, width)`
 
-![](pics/mosaic.png)
+![](https://github.com/MomsFriendlyRobotCompany/opencv_camera/blob/master/pics/mosaic.png?raw=true)
 
 Calibrate a camera with:
 
@@ -45,27 +46,38 @@ cam, cal = calibrator.calibrate(images, board)
 
 Display all of the found image points with `coverage((width, height), imagePoints)`
 
-![](pics/target-points.png)
+![](https://github.com/MomsFriendlyRobotCompany/opencv_camera/blob/master/pics/target-points.png?raw=true)
 
 ### Distortion
+
+Use the found calibration parameters to undistort an image:
 
 ```python
 un = UnDistort(cameraMatrix, distortionCoeff, w, h)
 corr_img = un.undistort(image)
 ```
 
+Visualize the lens distortion with:
+
 ```python
 visualizeDistortion(cameraMatrix, distortCoeff, height, width)
 ```
 
-![](pics/py-dist.png)
+![](https://github.com/MomsFriendlyRobotCompany/opencv_camera/blob/master/pics/py-dist.png?raw=true)
 
 ### Stereo
 
+Calibrate a stereo camera with:
+
+```python
+stereoCal = StereoCalibration()
+board = ChessboardFinder((9,6), 1)
+ok, cm, sc = stereoCal.calibrate(imgL, imgR, board)
+```
+
 Draw epipolar lines in stereo images with `drawEpipolarLines(imgpointsL,imgpointsR,imgL,imgR)`
 
-![](pics/epipolar.png)
-
+![](https://github.com/MomsFriendlyRobotCompany/opencv_camera/blob/master/pics/epipolar.png?raw=true)
 
 ## Apps
 
@@ -80,7 +92,7 @@ Use `program --help` to display switches for each of the following:
 # ToDo
 
 - [ ] Reorganize better
-- [ ] Add in apriltag calibration
+- [ ] Add in `apriltag` calibration
 - [ ] Add pointcloud from stereo
 - [x] Add parameters for known cameras
 - [ ] Better documentation
@@ -93,7 +105,7 @@ Use `program --help` to display switches for each of the following:
 
 | Data       | Version | Notes                                     |
 |------------|---------|-------------------------------------------|
-| 2018-07-19 | 0.10.11 | added distortion |
+| 2018-07-19 | 0.10.11 | added distortion and general cleanup |
 | 2018-07-19 | 0.10.6 | added UDP image server and client |
 | 2018-07-19 | 0.10.0 | renamed and focused on camera |
 | 2018-07-19 |  0.9.4 | simple clean-up and updating some things |
