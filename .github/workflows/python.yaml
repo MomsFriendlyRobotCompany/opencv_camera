@@ -28,7 +28,7 @@ jobs:
               uses: actions/cache@master
               with:
                 path: .venv
-                key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+                key: venv-${{ runner.os }}-${{ hashFiles('pyproject.toml') }}
             - name: Install packages
               run: |
                 echo "Installing dependencies"
