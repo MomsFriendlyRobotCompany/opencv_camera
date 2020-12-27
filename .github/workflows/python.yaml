@@ -34,8 +34,6 @@ jobs:
                 echo "Installing dependencies"
                 pwd
                 ls -al
-                ls -al .venv
-                source .venv/bin/activate
                 poetry install
               if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
             - name: Show Module Info
