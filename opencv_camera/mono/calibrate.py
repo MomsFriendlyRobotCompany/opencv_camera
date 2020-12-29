@@ -15,6 +15,7 @@ from ..undistort import DistortionCoefficients
 from ..color_space import bgr2gray, gray2bgr
 from .camera import Camera
 from tqdm import tqdm
+from colorama import Fore
 
 
 # @attr.s(slots=True)
@@ -52,19 +53,21 @@ class CameraCalibration:
         # print("{} {}".format(board.type, board.marker_size))
         # print('-'*40)
         # cnt = 0
+
+        bad_images = []
         for cnt, gray in enumerate(tqdm(images)):
             if len(gray.shape) > 2:
                 gray = bgr2gray(gray)
 
             # ret, corners = self.findMarkers(gray)
-            ret, corners = board.find(gray)
+            ok, corners, objp = board.find(gray)
 
             # If found, add object points, image points (after refining them)
-            if ret:
+            if ok:
                 # imgpoints.append(corners.reshape(-1, 2))
 
                 # get the real-world pattern of points
-                objp = board.objectPoints()
+                # objp = board.objectPoints()
                 objpoints.append(objp)
 
                 # print('[{}] + found {} of {} corners'.format(
@@ -79,7 +82,11 @@ class CameraCalibration:
                 # tmp = board.draw(gray, corners)
                 # self.save_cal_imgs.append(tmp)
             else:
-                print(f'{Fore.RED}*** Image[{cnt}] - Could not find markers ***{Fore.RESET}')
+                bad_images.append(cnt)
+                # print(f'{Fore.RED}*** Image[{cnt}] - Could not find markers ***{Fore.RESET}')
+
+        if len(bad_images) > 0:
+            print(f'{Fore.RED}>> Could not find markers in images: {bad_images}{Fore.RESET}')
 
         # images size here is backwards: w,h
         h, w = images[0].shape[:2]
@@ -117,9 +124,13 @@ class CameraCalibration:
             'rvecs': rvecs,
             'tvecs': tvecs,
             "objpoints": objpoints,
-            "imgpoints": imgpoints
+            "imgpoints": imgpoints,
+            "badImages": bad_images
         }
 
         cam = Camera(mtx, dist, images[0].shape[:2])
+
+        print(f"{Fore.GREEN}>> RMS: {rms:0.2f}px{Fore.RESET}")
+        print("\n",cam)
 
         return cam, data

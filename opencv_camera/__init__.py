@@ -5,6 +5,7 @@
 ##############################################
 
 from .targets.chessboard import ChessboardFinder
+from .targets.apriltags import ApriltagFinder
 
 from .mono.camera import Camera
 from .mono.calibrate import CameraCalibration
@@ -15,6 +16,9 @@ from .stereo.fundamental_matrix import findFundamentalMat
 
 from .undistort import UnDistort
 from .distortion import visualizeDistortion
+
+from .apriltag.apriltag_detections import visualizeApriltagDetections
+from .apriltag.apriltag_marker import ApriltagMarker
 
 from .reproject import computeReprojectionErrors
 from .reproject import visualizeReprojErrors

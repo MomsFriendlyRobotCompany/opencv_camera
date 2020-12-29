@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def visualizeDistortion(K, D, h, w, fontsize=16, contourLevels=10):
+def visualizeDistortion(K, D, h, w, fontsize=16, contourLevels=10, nstep=20):
     """
     http://amroamroamro.github.io/mexopencv/opencv/calibration_demo.html
     https://docs.opencv.org/3.2.0/d9/d0c/group__calib3d.html#details
@@ -38,7 +38,7 @@ def visualizeDistortion(K, D, h, w, fontsize=16, contourLevels=10):
     p2 = D[3]
     k3 = D[4]
 
-    nstep = 20
+    # nstep = 20
     u,v = np.meshgrid(
         np.arange(0, w, nstep),
         np.arange(0, h, nstep)

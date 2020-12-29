@@ -50,42 +50,39 @@ def tip_sheet(imgs, width=5, scale=None):
     raise DeprecationWarning("Use mosaic instead")
     return mosaic(imgs, width, scale)
 
-def mosaic(imgs, width=5, scale=None):
+def mosaic(imgs, width=None):
     """
     Creates a single image (mosaic) with thumb nails of
     the input images. Useful for displaying a batch of calibration
     images.
 
     imgs: array of grayscale images
-    width: number of thumbnail images across the tip sheet
-           will be
-    scale: scale the resulting image down FIXME: implement
+    width: number of thumbnail images across the mosaic
     """
-    tip = None
     num = len(imgs)
     r,c = imgs[0].shape[:2]
-    wid = width
-    rr = int(np.floor(r/wid))
+    if width is None:
+        width=int(np.ceil(np.sqrt(num)))
+
+    # determine new image size
+    rr = int(np.floor(r/width))
     cc = int(c*rr/r)
-    row = None
 
-    for i in range(num):
-        im = cv2.resize(imgs[i],(cc,rr,),interpolation=cv2.INTER_NEAREST)
+    canvas = np.zeros((rr*int(np.ceil(num/width)), cc*width))
+    # print("canvas:", canvas.shape)
 
-        if i == 0:
-            row = im.copy()
-        elif i == (num-1):
-            blk = np.zeros((row.shape[0], tip.shape[1]))
-            blk[:row.shape[0],:row.shape[1]] = row
-            row = blk
-            tip = np.vstack((tip, row))
-        elif i%wid == 0:
-            if tip is None:
-                tip = row.copy()
-            else:
-                tip = np.vstack((tip, row))
-            row = im.copy()
-        else:
-            row = np.hstack((row, im))
+    j = -1
+    for n in range(num):
+        im = imgs[n]
+        if len(im.shape) > 2:
+            im = bgr2gray(im)
 
-    return tip
+        im = cv2.resize(im,(cc,rr,),interpolation=cv2.INTER_NEAREST)
+
+        i = n%width
+        j = j+1 if (i%width) == 0 else j
+
+        # print(j*rr,j*rr+rr,"|",i*cc,i*cc+cc)
+
+        canvas[j*rr:j*rr+rr,i*cc:i*cc+cc] = im
+    return canvas

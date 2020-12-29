@@ -10,7 +10,7 @@ from collections import namedtuple
 DistortionCoefficients = namedtuple("DistortionCoefficients", "k1 k2 p1 p2 k3")
 
 class UnDistort:
-    def __init__(self, camMat, dist, w, h, R=None):
+    def __init__(self, K, d, h, w, R=None):
         """
         Sets up the class with an Optimal Camera Matrix alpha of zero, which
         removes all unwanted pixels
@@ -23,17 +23,18 @@ class UnDistort:
         For undistorting stereo images, only use R on the right camera image
         and not the left one.
         """
-        self.camMat = camMat
-        self.dist = dist
-        self.size = (w,h)
-        self.optCamMat, _ = cv2.getOptimalNewCameraMatrix(camMat, dist, self.size, 0)
+        self.K = K
+        self.d = d
+        self.size = (w,h) # backwards
+        self.shape = (h,w)
+        optCamMat, _ = cv2.getOptimalNewCameraMatrix(K, d, self.size, 0)
 
         self.R = R
         self.mapx, self.mapy = cv2.initUndistortRectifyMap(
-            camMat,dist,
+            K,d,
             R,
-            self.optCamMat,
-            (w,h),
+            optCamMat,
+            self.size, # (w,h) -- backwards # (w,h) -- backwards
             cv2.CV_32FC1
         )
 
@@ -76,14 +77,22 @@ class UnDistort:
         self.mapx and self.mapy are EACH the same size as the image and both
         are float32. So although faster, it consumes more memory.
         """
+        if self.shape != image.shape:
+            raise Exception(f"Undistort set for image.shape = {self.shape}, not {image.shape}")
+
         if alpha is not None:
-            self.optCamMat, _ = cv2.getOptimalNewCameraMatrix(
-                self.camMat,
-                self.dist,
-                self.size,
+            optCamMat, _ = cv2.getOptimalNewCameraMatrix(
+                self.K,
+                self.d,
+                self.size, # (w,h) -- backwards
                 alpha
             )
-            self.mapx, self.mapy = cv2.initUndistortRectifyMap(K,d,R,nK,(w,h),cv2.CV_32FC1)
+            self.mapx, self.mapy = cv2.initUndistortRectifyMap(
+                self.K, self.d, self.R,
+                optCamMat,
+                self.size, # (w,h) -- backwards
+                cv2.CV_32FC1)
+
         return cv2.remap(image,self.mapx,self.mapy,cv2.INTER_LINEAR)
 
     # def distortionMap(self):

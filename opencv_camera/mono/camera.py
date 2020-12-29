@@ -19,7 +19,9 @@ class Camera:
 
     def __str__(self):
         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))
-        s = f'{Fore.BLUE}Camera --------------------------\n'
+
+        s = f'{Fore.BLUE}Camera[{self.shape}]----------------------{Fore.RESET}\n'
         s += f'  focalLength(x,y): {self.K[0,0]:.1f} {self.K[1,1]:.1f} px \n'
         s += f'  principlePoint(x,y): {self.K[0,2]:.1f} {self.K[1,2]:.1f} px\n'
         s += f'  distortionCoeffs: {self.d}\n'
+        return s

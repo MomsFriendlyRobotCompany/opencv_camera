@@ -49,7 +49,7 @@ def drawEpipolarLines(pts1, pts2, img1, img2):
     return np.hstack((img5, img3))
 
 
-def drawHorizontalLines(l, r, lines=True, thickness=1):
+def drawHorizontalLines(l, r, lines=True, thickness=1, step=20):
     """
     Display left/right stereo images and draw epipolar lines on image pairs.
     Images should be rectified to be meaningful.
@@ -62,6 +62,6 @@ def drawHorizontalLines(l, r, lines=True, thickness=1):
         n = gray2bgr(n)
     if lines:
         h, w = n.shape[:2]
-        for r in range(0, h, 20):
+        for r in range(0, h, step):
             cv2.line(n,(0,r), (w,r), (200,0,0), thickness)
     return n
