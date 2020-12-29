@@ -76,6 +76,8 @@ class StereoCalibration(object):
         objpoints = data["objpoints"]
         imgpoints_l =  data["imgpoints"]
 
+        time.sleep(1)
+
         cam, data = cc.calibrate(imgs_r, board)
         K2 = cam.K
         d2 = cam.d
@@ -83,9 +85,9 @@ class StereoCalibration(object):
         tvecs2 = data["tvecs"]
         imgpoints_r =  data["imgpoints"]
 
-        print(d1,d2)
+        # print(d1,d2)
 
-        self.save_cal_imgs = cc.save_cal_imgs
+        # self.save_cal_imgs = cc.save_cal_imgs
 
         """
         CALIB_ZERO_DISPARITY: horizontal shift, cx1 == cx2

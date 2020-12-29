@@ -23,14 +23,6 @@ class CameraCalibration:
     '''
     Simple calibration class.
     '''
-    # marker_type = attr.ib()
-    # marker_size = attr.ib()
-    # marker_scale = attr.ib(default=1)
-    # save_cal_imgs = attr.ib(default=None)
-    # save_objpoints = attr.ib(default=None)
-    # save_imgpoints = attr.ib(default=None)
-
-    save_cal_imgs = None
 
     def calibrate(self, images, board, flags=None):
         """
@@ -41,18 +33,13 @@ class CameraCalibration:
             checkerboard with sides 2 cm, set marker_scale=0.02 so your T matrix
             comes out in meters
         """
-        self.save_cal_imgs = []
+        # self.save_cal_imgs = []
 
         # Arrays to store object points and image points from all the images.
         objpoints = []  # 3d point in real world space
         imgpoints = []  # 2d points in image plane.
 
         max_corners = board.marker_size[0]*board.marker_size[1]
-
-        # print("Images: {} @ {}".format(len(images), images[0].shape))
-        # print("{} {}".format(board.type, board.marker_size))
-        # print('-'*40)
-        # cnt = 0
 
         bad_images = []
         for cnt, gray in enumerate(tqdm(images)):
@@ -101,17 +88,18 @@ class CameraCalibration:
             [ 0,  0,  1]
         ])
 
+        # not sure how much these really help
         if flags is None:
             flags = 0
             # flags |= cv2.CALIB_THIN_PRISM_MODEL
             # flags |= cv2.CALIB_TILTED_MODEL
             # flags |= cv2.CALIB_RATIONAL_MODEL
 
-        rms, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
-            objpoints, imgpoints, (w, h), K, None, flags=flags)
+        # rms, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(
+        #     objpoints, imgpoints, (w, h), K, None, flags=flags)
 
-        # rms, mtx, dist, rvecs, tvecs = cv2.calibrateCameraExtended(
-        #     objpoints, imgpoints, (w, h), K, None)
+        rms, mtx, dist, rvecs, tvecs, stdDeviationsIntrinsics, stdDeviationsExtrinsics, perViewErrors = cv2.calibrateCameraExtended(
+            objpoints, imgpoints, (w, h), K, None)
 
         data = {
             'date': time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()),
@@ -125,12 +113,15 @@ class CameraCalibration:
             'tvecs': tvecs,
             "objpoints": objpoints,
             "imgpoints": imgpoints,
-            "badImages": bad_images
+            "badImages": bad_images,
+            "stdint": stdDeviationsIntrinsics,
+            "stdext": stdDeviationsExtrinsics,
+            "perViewErr": perViewErrors
         }
 
         cam = Camera(mtx, dist, images[0].shape[:2])
 
-        print(f"{Fore.GREEN}>> RMS: {rms:0.2f}px{Fore.RESET}")
+        print(f"{Fore.GREEN}>> RMS: {rms:0.3f}px{Fore.RESET}")
         print("\n",cam)
 
         return cam, data

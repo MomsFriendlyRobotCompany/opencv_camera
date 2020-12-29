@@ -34,15 +34,20 @@ class ChessboardFinder:
             flags |= cv2.CALIB_CB_FAST_CHECK
             flags |= cv2.CALIB_CB_NORMALIZE_IMAGE
 
+        # ok,gray = cv2.threshold(gray,90,255,cv2.THRESH_BINARY)
+
         ret, corners = cv2.findChessboardCorners(
             gray,
             self.marker_size,
             flags=flags)
 
         if not ret:
-            corners = []
+            corners = None
+            objp = None
+        else:
+            objp = self.objectPoints()
 
-        return ret, corners
+        return ret, corners, objp
 
     def objectPoints(self):
         """
