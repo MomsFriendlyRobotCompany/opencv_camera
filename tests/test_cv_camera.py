@@ -5,6 +5,8 @@ from opencv_camera import ChessboardFinder
 from opencv_camera import UnDistort
 from opencv_camera import SaveVideo
 from opencv_camera import bgr2gray, gray2bgr
+from opencv_camera import rgb2bgr, bgr2rgb
+from opencv_camera import bgr2hsv, hsv2bgr
 from opencv_camera import Compressor
 import opencv_camera
 import slurm
@@ -12,6 +14,8 @@ import cv2
 import numpy as np
 from pathlib import Path
 from slurm.files import rm
+import pytest
+
 
 def get():
     imgs = []
@@ -93,13 +97,17 @@ def test_save():
 
     assert True
 
-def test_colorspace():
+def colorspace(a, b):
     p = Path(__file__).parent.absolute() / "cal_images/left01.jpg"
     im = cv2.imread( str(p) )
-    g = bgr2gray(im)
-    c = gray2bgr(g)
-    assert len(g.shape) == 2
-    assert len(c.shape) == 3
+    g = a(im)
+    im2 = b(g)
+    assert np.array_equal(im, im2)
+    assert np.array_equal(im.shape, im2.shape)
+
+def test_colorspace():
+    colorspace(bgr2hsv, hsv2bgr)
+    colorspace(bgr2rgb, rgb2bgr)
 
 def compressor(fmt, color):
     p = Path(__file__).parent.absolute() / "cal_images/left01.jpg"
@@ -121,3 +129,7 @@ def test_compressor():
     for fmt in ["png", "jpg", ".png", ".jpg"]:
         for color in [True, False]:
             compressor(fmt, color)
+
+def test_fail_compressor():
+    with pytest.raises(ValueError):
+        compressor("jpeg", False)

@@ -9,6 +9,11 @@ import cv2
 
 
 class Compressor:
+    """
+    Compressor allow you to serialize and compress an image using either JPEG
+    or PNG compression.
+    """
+
     _format = ".png"
 
     @property
@@ -17,8 +22,11 @@ class Compressor:
 
     @format.setter
     def format(self, fmt):
+        """
+        Set format to either .jpg jpg .png png
+        """
         if fmt not in [".jpg", "jpg", ".png", "png"]:
-            raise ValueError("Invalid format: {fmt}")
+            raise ValueError(f"Invalid format: {fmt}")
         if fmt.find(".") != 0:
             fmt = "." + fmt
         self._format = fmt
