@@ -5,6 +5,7 @@ from opencv_camera import ChessboardFinder
 from opencv_camera import UnDistort
 from opencv_camera import SaveVideo
 from opencv_camera import bgr2gray, gray2bgr
+from opencv_camera import Compressor
 import opencv_camera
 import slurm
 import cv2
@@ -99,3 +100,24 @@ def test_colorspace():
     c = gray2bgr(g)
     assert len(g.shape) == 2
     assert len(c.shape) == 3
+
+def compressor(fmt, color):
+    p = Path(__file__).parent.absolute() / "cal_images/left01.jpg"
+    im = cv2.imread( str(p) )
+    if not color:
+        im = bgr2gray(im)
+    print(">> Compressor:", fmt, color, im.shape)
+
+    c = Compressor()
+    c.format = fmt
+    cimg = c.compress(im)
+    uimg = c.uncompress(cimg,im.shape)
+
+    if fmt in ["png", ".png"]:
+        assert np.array_equal(im, uimg)
+    assert np.array_equal(im.shape, uimg.shape)
+
+def test_compressor():
+    for fmt in ["png", "jpg", ".png", ".jpg"]:
+        for color in [True, False]:
+            compressor(fmt, color)

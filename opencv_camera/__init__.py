@@ -3,7 +3,7 @@
 # Copyright (c) 2014 Kevin Walchko
 # see LICENSE for full details
 ##############################################
-
+# -*- coding: utf-8 -*
 from .targets.chessboard import ChessboardFinder
 from .targets.apriltags import ApriltagFinder
 
@@ -40,6 +40,8 @@ from .color_space import hsv2bgr, bgr2hsv
 from .color_space import bgr2rgb, rgb2bgr
 # from .color_space import bgr2gray, rgb2gray, gray2bgr, hsv2bgr, bgr2hsv
 # from .display import FlipBook
+
+from .compression import Compressor
 
 try:
     from importlib.metadata import version # type: ignore
