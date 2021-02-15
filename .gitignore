@@ -13,3 +13,4 @@ build
 *.m4v
 *.lock
 .*_cache
+datasets/
