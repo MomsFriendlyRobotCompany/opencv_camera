@@ -19,6 +19,8 @@ pip install opencv_camera
 
 ## Usage
 
+See the jupyter notebooks under the `docs` in the repository for some examples.
+
 ### Colorspace
 
 Change between common colorspaces with:
