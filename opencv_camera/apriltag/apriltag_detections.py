@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def visualizeApriltagDetections(objpts, imgpts, img):
+def visualizeTargetDetections(objpts, imgpts, img):
     """
     Plots the detected target tags and the image with the
     detected tags overlaid.
@@ -30,7 +30,8 @@ def visualizeApriltagDetections(objpts, imgpts, img):
         plt.plot(x,y)
     plt.grid(True)
     plt.title("Object Points in World Space [meters]")
-    plt.axis("equal");
+    # plt.axis("equal");
+    plt.axis("square")
 
     plt.subplot(122)
     plt.scatter(imgpts[:,0],imgpts[:,1])

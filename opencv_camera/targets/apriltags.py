@@ -8,6 +8,7 @@ import cv2
 from opencv_camera.color_space import bgr2gray, gray2bgr
 import numpy as np
 from ..apriltag.apriltag_marker import ApriltagMarker
+from colorama import Fore
 
 tag_sizes = {
     'tag16h5' : 6,
@@ -17,7 +18,7 @@ tag_sizes = {
 }
 
 
-class ApriltagFinder:
+class ApriltagTargetFinder:
     def __init__(self, detector, size, scale):
         """
         size: pattern of chess board, tuple(rows, columns)
@@ -57,12 +58,20 @@ class ApriltagFinder:
         # get complete listing of objpoints in a target
         opdict = self.objectPoints()
 
+        invalid_id = False
+
         ob = []
         tt = []
         # for each tag, get corners and obj point corners:
         for tag in tags:
             # add found objpoint to list IF tag id found in image
-            obcorners = opdict[tag.tag_id]
+            try:
+                obcorners = opdict[tag.tag_id]
+            except KeyError as e:
+                # print(f"*** {e} ***")
+                invalid_id = True
+                continue
+
             for oc in obcorners:
                 ob.append(oc)
             cs = tag.corners
@@ -73,6 +82,8 @@ class ApriltagFinder:
         objpts = np.array(ob, dtype=np.float32)
         # print("corners", corners.shape, corners.dtype)
         # print(corners)
+        # if invalid_id:
+        #     print(f"{Fore.RED}*** Invalid tag ID's found ***{Fore.RESET}")
 
         return True, corners, objpts
 
