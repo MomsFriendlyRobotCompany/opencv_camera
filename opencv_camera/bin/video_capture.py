@@ -12,7 +12,7 @@
 #
 
 import cv2
-import yaml
+# import yaml
 import argparse
 # from opencvutils import CameraCV
 from opencv_camera import ThreadedCamera
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--path', help='location to grab images, default is current directory', default='.')
     parser.add_argument('-f', '--video_filename', help='video file name, default is "out.mp4"', default='out')
     parser.add_argument('-i', '--colorspace', type=str, help='colorspace: bgr, rgb, hsv, or gray; default is bgr', default="bgr")
-    parser.add_argument('-n', '--numpy', type=str, help='numpy camera calibration matrix')
+    # parser.add_argument('-n', '--numpy', type=str, help='numpy camera calibration matrix')
     parser.add_argument('-s', '--size', type=int, nargs=2, help='size of image capture (height, width ), i.e., 480 640')
     parser.add_argument('-v', '--version', action='version', help='returns version number', version=f"{sys.argv[0]} version {VERSION}")
 
@@ -64,12 +64,12 @@ if __name__ == '__main__':
         size = (480, 640)
 
     # calibration matrix
-    if args['numpy'] is not None:
-        cam_cal = args['numpy']
-        d = read(cam_cal)
-        m = d['camera_matrix']
-        k = d['dist_coeff']
-        print('Using supplied camera calibration matrix: {}'.format(cam_cal))
+    # if args['numpy'] is not None:
+    #     cam_cal = args['numpy']
+    #     d = read(cam_cal)
+    #     m = d['camera_matrix']
+    #     k = d['dist_coeff']
+    #     print('Using supplied camera calibration matrix: {}'.format(cam_cal))
 
     # print size
     # print cam_cal

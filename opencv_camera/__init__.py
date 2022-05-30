@@ -43,10 +43,7 @@ from .color_space import bgr2rgb, rgb2bgr
 
 from .compression import Compressor
 
-try:
-    from importlib.metadata import version # type: ignore
-except ImportError:
-    from importlib_metadata import version # type: ignore
+from importlib.metadata import version # type: ignore
 
 __license__ = 'MIT'
 __copyright__ = 'Copyright (c) 2014 Kevin Walchko'

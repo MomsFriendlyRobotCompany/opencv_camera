@@ -8,13 +8,13 @@ import numpy as np
 np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 import cv2
-import attr
+# import attr
 import time
 from collections import namedtuple
 from ..undistort import DistortionCoefficients
 from ..color_space import bgr2gray, gray2bgr
 from .camera import Camera
-from tqdm import tqdm
+# from tqdm import tqdm
 from colorama import Fore
 
 
@@ -42,7 +42,8 @@ class CameraCalibration:
         max_corners = board.marker_size[0]*board.marker_size[1]
 
         bad_images = []
-        for cnt, gray in enumerate(tqdm(images)):
+        # for cnt, gray in enumerate(tqdm(images)):
+        for cnt, gray in enumerate(images):
             if len(gray.shape) > 2:
                 gray = bgr2gray(gray)
 

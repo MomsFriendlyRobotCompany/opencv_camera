@@ -8,12 +8,43 @@ from colorama import Fore
 import io
 from threading import Thread #, Lock
 import time
-from slurm.rate import Rate
+# from slurm.rate import Rate
 import numpy as np
 import cv2
 # from enum import IntFlag
 import attr
 from .color_space import ColorSpace
+
+import time
+
+
+class Rate:
+    """
+    Uses sleep to keep a desired message/sample rate for a loop.
+    """
+    def __init__(self, hertz):
+        """
+            :hertz: rate loop should run at
+        """
+        self.last_time = time.time()
+        self.dt = 1/hertz
+
+    def sleep(self):
+        """
+        This uses sleep to delay the function. If your loop is faster than your
+        desired Hertz, then this will calculate the time difference so sleep
+        keeps you close to you desired hertz. If your loop takes longer than
+        your desired hertz, then it doesn't sleep.
+        """
+        now = time.time()
+        diff = now - self.last_time
+        if diff < self.dt:
+            new_sleep = self.dt - diff
+            time.sleep(new_sleep)
+
+        # now that we hav slept a while, set the current time
+        # as the last time
+        self.last_time = time.time()
 
 #                                     1   2   3   4
 # ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
