@@ -9,12 +9,29 @@ from opencv_camera import rgb2bgr, bgr2rgb
 from opencv_camera import bgr2hsv, hsv2bgr
 from opencv_camera import Compressor
 import opencv_camera
-import slurm
+# import slurm
 import cv2
 import numpy as np
 from pathlib import Path
-from slurm.files import rm
+# from slurm.files import rm
 import pytest
+import os
+
+
+def rm(fname):
+    """Removes (deletes) a file or list of files"""
+    if fname is None:
+        # print(f"{Fore.RED}*** No file to remove ***{Fore.RESET}")
+        return
+    if not isinstance(fname, list):
+        fname = [fname]
+    for f in fname:
+        try:
+            os.remove(f)
+            # print(f"{Fore.RED}- {f}{Fore.RESET}")
+        except FileNotFoundError:
+            # folder was already deleted or doesn't exist ... it's ok
+            pass
 
 
 def get():
@@ -31,13 +48,13 @@ def get():
     print(f">> Found {len(imgs)} images")
     return imgs
 
-def test_info():
-    print("")
-    print(f">> opencv_camera version: {opencv_camera.__version__}")
-    print(f">> cv2 version: {cv2.__version__}")
-    print(f">> slurm version: {slurm.__version__}")
-
-    assert True
+# def test_info():
+#     print("")
+#     print(f">> opencv_camera version: {opencv_camera.__version__}")
+#     print(f">> cv2 version: {cv2.__version__}")
+#     print(f">> slurm version: {slurm.__version__}")
+#
+#     assert True
 
 
 """
