@@ -172,14 +172,20 @@ class StereoCalibration(object):
             "imgpointsR": imgpoints_r,
         }
 
-        sc = StereoCamera()
-        sc.R = R
-        sc.E = E
-        sc.F = F
-        sc.T = T
-        sc.K1 = K1
-        sc.K2 = K2
-        sc.d1 = d1
-        sc.d2 = d2
+        sc = StereoCamera(
+            K1,d1,
+            K2,d2,
+            R,T,
+            F,
+            E
+        )
+        # sc.R = R
+        # sc.E = E
+        # sc.F = F
+        # sc.T = T
+        # sc.K1 = K1
+        # sc.K2 = K2
+        # sc.d1 = d1
+        # sc.d2 = d2
 
         return ret, camera_model, sc

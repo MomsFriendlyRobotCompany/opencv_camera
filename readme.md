@@ -104,6 +104,7 @@ Use `program --help` to display switches for each of the following:
 - [x] Add `visualizeDistortion`
 - [ ] Add `visualizeExtrinsics`
 - [x] Remove `attrs`
+- [x] Add save/load from yaml
 
 # Change Log
 

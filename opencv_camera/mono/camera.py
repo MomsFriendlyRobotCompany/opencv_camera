@@ -8,6 +8,8 @@ from colorama import Fore
 from dataclasses import dataclass
 import numpy as np
 from ..undistort import UnDistort
+from pathlib import Path
+import yaml
 
 
 @dataclass
@@ -36,9 +38,38 @@ class Camera:
         return s
 
     def getUndistortion(self):
-        return Undistort(
+        return UnDistort(
             self.K,
             self.d,
             self.h,
             self.w
         )
+
+    @classmethod
+    def from_yaml(cls, file):
+        if not isinstance(file, Path):
+            p = Path(file)
+        p = p.expanduser().resolve()
+
+        with p.open(mode="r") as fd:
+            info = yaml.safe_load(fd)
+
+        args = []
+        for key in ["K","d","w","h"]:
+            args.append(np.array(info[key]))
+
+        c = cls(*args)
+
+        return c
+
+    def to_yaml(self, filename):
+        camera_parameters = {
+            "K": self.K.tolist(),
+            "d": self.d.tolist(),
+            "w": self.w,
+            "h": self.h,
+        }
+
+        p = Path(filename).expanduser().resolve()
+        with p.open("w") as fd:
+            yaml.safe_dump(camera_parameters, fd)
