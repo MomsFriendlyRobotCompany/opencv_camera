@@ -21,7 +21,7 @@ pip install opencv_camera
 
 See the jupyter notebooks under the `docs` in the repository for some examples.
 
-Online [nbviewer](nbviewer.org/github/MomsFriendlyRobotCompany/opencv_camera/tree/master/docs/jupyter/)
+Online [nbviewer](https://nbviewer.org/github/MomsFriendlyRobotCompany/opencv_camera/tree/master/docs/jupyter/)
 
 ### Colorspace
 
