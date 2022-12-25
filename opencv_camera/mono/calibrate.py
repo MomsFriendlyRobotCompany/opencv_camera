@@ -129,7 +129,7 @@ class CameraCalibration:
             "perViewErr": perViewErrors
         }
 
-        cam = Camera(mtx, dist, images[0].shape[:2])
+        cam = Camera(mtx, dist, *images[0].shape[:2])
 
         print(f"{Fore.GREEN}>> RMS: {rms:0.3f}px{Fore.RESET}")
         print("\n",cam)

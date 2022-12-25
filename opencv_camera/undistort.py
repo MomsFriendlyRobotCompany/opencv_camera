@@ -38,29 +38,6 @@ class UnDistort:
             cv2.CV_32FC1
         )
 
-    # def undistort2(self, image, alpha=None):
-    #     """
-    #     image: an image
-    #     alpha: values between 0 and 1 which determines the amount of unwanted
-    #         pixels. The default is 0, but if changed, a new Optimal Camera
-    #         Matrix is calculated for the alpha
-    #
-    #     alpha = 0: returns undistored image with minimum unwanted pixels (image
-    #                 pixels at corners/edges could be missing)
-    #     alpha = 1: retains all image pixels but there will be black to make up
-    #                 for warped image correction
-    #     """
-    #     # Adjust the calibrations matrix
-    #     if alpha is not None:
-    #         self.optCamMat, _ = cv2.getOptimalNewCameraMatrix(
-    #             self.camMat,
-    #             self.dist,
-    #             self.size,
-    #             alpha
-    #         )
-    #     # undistort
-    #     return cv2.undistort(image, self.camMat, self.dist, None, self.optCamMat)
-
     def undistort(self, image, alpha=None):
         """
         image: an image

@@ -9,6 +9,17 @@ from pathlib import Path
 import yaml
 import numpy as np
 from dataclasses import dataclass
+from ..undistort import UnDistort
+
+class UndistortStereo:
+    def __init__(self, K1, d1, K2,d2, h, w, R):
+        self.left = UnDistort(K1,d1,h,w)
+        self.right = UnDistort(K2,d2,h,w,R)
+
+    def undistort(self, a, b):
+        a = self.left.undistort(a)
+        b = self.right.undistort(b)
+        return a,b
 
 
 @dataclass
@@ -17,17 +28,26 @@ class StereoCamera:
     Nice class for holding stereo camera info and
     reading to or writing from yaml.
 
+    K: camera matrix
+    d: distortion coefficients
+    R: rotation matrix between left/right camera
+    T: translation vector between left/right camera
+    F: fundamental matrix
+    E: essential matrix
+
     subcripts: 1-left, 2-right
     """
-    # these default to None so from_yaml() function works correctly
-    K1: np.ndarray = None # left camera matrix
-    d1: np.ndarray = None # left distortion coefficients
-    K2: np.ndarray = None # right camera matrix
-    d2: np.ndarray = None # right distortion coefficients
-    R: np.ndarray = None  # rotation between left/right cameras
-    T: np.ndarray = None  # translation between left/right cameras
-    F: np.ndarray = None  # fundamental matrix
-    E: np.ndarray = None  # essential matrix
+
+    K1: np.ndarray # left camera matrix
+    d1: np.ndarray # left distortion coefficients
+    K2: np.ndarray # right camera matrix
+    d2: np.ndarray # right distortion coefficients
+    R: np.ndarray  # rotation between left/right cameras
+    T: np.ndarray  # translation between left/right cameras
+    F: np.ndarray  # fundamental matrix
+    E: np.ndarray  # essential matrix
+    # h: int # height/rows
+    # w: int # width/columns
 
     def __str__(self):
         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))
@@ -59,10 +79,15 @@ class StereoCamera:
         with p.open(mode="r") as fd:
             info = yaml.safe_load(fd)
 
-        sc = cls()
+        args = []
+        for key in ["K1","d1","K2","d2","R","T","F","E"]:
+            args.append(np.array(info[key]))
 
-        for key in info.keys():
-            sc.__dict__[key] = np.array(info[key])
+        sc = cls(*args)
+        # sc = cls()
+
+        # for key in info.keys():
+        #     sc.__dict__[key] = np.array(info[key])
 
         return sc
 
@@ -75,7 +100,9 @@ class StereoCamera:
             "T": self.T.tolist(),
             "R": self.R.tolist(),
             "F": self.F.tolist(),
-            "E": self.E.tolist()
+            "E": self.E.tolist(),
+            # "w": self.w,
+            # "h": self.h,
         }
 
         p = Path(filename).expanduser().resolve()
@@ -90,6 +117,18 @@ class StereoCamera:
         """Returns projection matrix: P2 = K2*[R|t]"""
         return self.K2 @ np.hstack((self.R, self.T.T))
 
+    def getUndistortion(self, h, w):
+        return UndistortStereo(
+            self.K1,
+            self.d1,
+            self.K2,
+            self.d2,
+            h,w,
+            self.R
+        )
+
+    # def scale(self, scale):
+    #     return None
 
 
 

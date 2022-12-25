@@ -21,6 +21,8 @@ pip install opencv_camera
 
 See the jupyter notebooks under the `docs` in the repository for some examples.
 
+Online [nbviewer](nbviewer.org/github/MomsFriendlyRobotCompany/opencv_camera/tree/master/docs/jupyter/)
+
 ### Colorspace
 
 Change between common colorspaces with:
@@ -96,7 +98,7 @@ Use `program --help` to display switches for each of the following:
 - [ ] Add in `apriltag` calibration
 - [ ] Add pointcloud from stereo
 - [x] Add parameters for known cameras
-- [ ] Add Jupyter notebook documentation and examples
+- [x] Add Jupyter notebook documentation and examples
 - [x] Simplify stereo camera
 - [x] Add `computeReprojectionErrors` and `visualizeReprojErrors`
 - [x] Add `visualizeDistortion`

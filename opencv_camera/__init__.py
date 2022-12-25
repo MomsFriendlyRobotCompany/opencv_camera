@@ -10,7 +10,7 @@ from .targets.apriltags import ApriltagTargetFinder
 from .mono.camera import Camera
 from .mono.calibrate import CameraCalibration
 
-from .stereo.camera import StereoCamera
+from .stereo.camera import StereoCamera, UndistortStereo
 from .stereo.calibrate import StereoCalibration
 from .stereo.fundamental_matrix import findFundamentalMat
 
