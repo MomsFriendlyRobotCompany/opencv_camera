@@ -8,7 +8,6 @@ import numpy as np
 np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 import cv2
-# import attr
 import time
 from collections import namedtuple
 from ..undistort import DistortionCoefficients
@@ -18,7 +17,6 @@ from .camera import Camera
 from colorama import Fore
 
 
-# @attr.s(slots=True)
 class CameraCalibration:
     '''
     Simple calibration class.
@@ -40,6 +38,7 @@ class CameraCalibration:
         imgpoints = []  # 2d points in image plane.
 
         max_corners = board.marker_size[0]*board.marker_size[1]
+        # print(max_corners)
 
         bad_images = []
         # for cnt, gray in enumerate(tqdm(images)):
@@ -49,9 +48,19 @@ class CameraCalibration:
 
             # ret, corners = self.findMarkers(gray)
             ok, corners, objp = board.find(gray)
+            # if not ok:
+            #     continue
+            # print(len(corners))
+            # print(corners)
+            # raise Exception()
+            # if len(corners) // 4 != max_corners:
+            #     continue
 
             # If found, add object points, image points (after refining them)
             if ok:
+                # if len(corners) // 4 != max_corners:
+                #     bad_images.append(cnt)
+                #     continue
                 # imgpoints.append(corners.reshape(-1, 2))
 
                 # get the real-world pattern of points

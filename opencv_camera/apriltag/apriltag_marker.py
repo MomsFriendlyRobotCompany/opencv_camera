@@ -7,6 +7,9 @@
 from opencv_camera.color_space import bgr2gray, gray2bgr
 import numpy as np
 import cv2
+from collections import namedtuple
+
+Tag = namedtuple("Tag","tag_id corners")
 
 
 class ApriltagMarker:
@@ -21,11 +24,11 @@ class ApriltagMarker:
 
         for tag in tags:
             num = tag.tag_id if id else None
-            color_img = self.draw_tag(color_img, tag.corners, tag_id=num, mark=mark)
+            color_img = self.__draw_tag(color_img, tag.corners, tag_id=num, mark=mark)
 
         return color_img
 
-    def draw_tag(self, color_img, corners, tag_id=None, mark=False):
+    def __draw_tag(self, color_img, corners, tag_id=None, mark=False):
         """
         color_img: image to draw on, must be color
         corners: corner points from apriltag detector, v[0] is the
@@ -70,3 +73,14 @@ class ApriltagMarker:
                         color=(255, 0, 255))
 
         return color_img
+
+    @staticmethod
+    def tagArray(ids, corners):
+        if len(ids) != len(corners):
+            return None
+
+        tags = []
+        for ident, corner in zip(ids.flatten(), corners):
+            tags.append(Tag(ident, corner[0]))
+
+        return tags

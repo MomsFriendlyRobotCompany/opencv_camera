@@ -4,18 +4,18 @@
 # see LICENSE for full details
 ##############################################
 # -*- coding: utf-8 -*
-import attr
 from colorama import Fore
+from dataclasses import dataclass
+import numpy as np
 
-
-@attr.s(slots=True)
+@dataclass
 class Camera:
     """
     Nice class for holding stereo camera info
     """
-    K = attr.ib() # left camera matrix
-    d = attr.ib() # distortion coefficients
-    shape = attr.ib() # image size that was calibrated
+    K: np.ndarray # left camera matrix
+    d: np.ndarray # distortion coefficients
+    shape: np.ndarray # image size that was calibrated
 
     def __str__(self):
         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))

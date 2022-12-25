@@ -21,7 +21,7 @@ def findFundamentalMat(K1, K2, R, t, normalize=True):
     [1] http://www.cse.psu.edu/~rtc12/CSE486/lecture19.pdf
     [2] http://www.robots.ox.ac.uk/~vgg/hzbook/hzbook2/HZepipolar.pdf
     """
-    t = t.T[0]
+    t = t.ravel()
     A = (K1 @ R.T @ t)
     C = np.array([
         [    0, -A[2], A[1]],
@@ -31,4 +31,5 @@ def findFundamentalMat(K1, K2, R, t, normalize=True):
     ret = inv(K2).T @ R @ K1.T @ C
     if normalize:
         ret = ret/norm(ret)
+        # ret = ret/ret[2,2] # gives OpenCV answer
     return ret

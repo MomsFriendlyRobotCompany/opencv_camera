@@ -101,11 +101,13 @@ Use `program --help` to display switches for each of the following:
 - [x] Add `computeReprojectionErrors` and `visualizeReprojErrors`
 - [x] Add `visualizeDistortion`
 - [ ] Add `visualizeExtrinsics`
+- [x] Remove `attrs`
 
 # Change Log
 
-| Data       | Version | Notes                                     |
-|------------|---------|-------------------------------------------|
+| Data       | Version    | Notes                                     |
+|------------|------------|-------------------------------------------|
+|            | 2022.12.23 | changed version number to match date, changed to `opencv-contrib-python` |
 | 2020-12-27 | 0.10.10 | added distortion and reprojection display |
 | 2020-09-15 | 0.10.8 | added known camera params and general cleanup |
 | 2020-08-24 | 0.10.6 | added UDP image server and client |

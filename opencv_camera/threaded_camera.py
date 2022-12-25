@@ -12,7 +12,7 @@ import time
 import numpy as np
 import cv2
 # from enum import IntFlag
-import attr
+from dataclasses import dataclass
 from .color_space import ColorSpace
 
 import time
@@ -49,7 +49,7 @@ class Rate:
 #                                     1   2   3   4
 # ColorSpace = IntFlag("ColorSpace", "bgr rgb hsv gray")
 
-@attr.s(slots=True)
+@dataclass
 class ThreadedCamera:
     """
     https://www.raspberrypi.org/documentation/hardware/camera/
@@ -67,12 +67,12 @@ class ThreadedCamera:
     c.close()               # stops internal loop and gathers back up the thread
     """
 
-    camera = attr.ib(default=None)  # opencv camera object
-    frame = attr.ib(default=None)   # current frame
-    run = attr.ib(default=False)    # thread loop run parameter
-    thread_hz = attr.ib(default=30) # thread loop rate
-    fmt = attr.ib(default=0)        # colorspact format
-    ps = attr.ib(default=None)      # thread process
+    camera = None  # opencv camera object
+    frame: np.ndarray = None   # current frame
+    run: bool = False    # thread loop run parameter
+    thread_hz: float = 30 # thread loop rate
+    fmt: int = 0        # colorspact format
+    ps = None      # thread process
     # lock = attr.ib(default=Lock())
 
 

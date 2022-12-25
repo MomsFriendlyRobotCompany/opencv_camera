@@ -26,21 +26,23 @@ from .camera import StereoCamera
 
 
 class StereoCalibration(object):
-    def __init__(self, R=None, t=None):
-        """
-        The frame from left to right camera is [R|t]
-        """
-        # self.camera_model = None
-        self.save_cal_imgs = None
+    save_cal_imgs = None
 
-        # if R is None:
-        #     R = np.eye(3) # no rotation between left/right camera
-        # self.R = R
-        #
-        # if t is None:
-        #     t = np.array([0.1,0,0]) # 100mm baseline
-        #     t.reshape((3,1))
-        # self.t = t
+    # def __init__(self, R=None, t=None):
+    #     """
+    #     The frame from left to right camera is [R|t]
+    #     """
+    #     # self.camera_model = None
+    #     self.save_cal_imgs = None
+
+    #     # if R is None:
+    #     #     R = np.eye(3) # no rotation between left/right camera
+    #     # self.R = R
+    #     #
+    #     # if t is None:
+    #     #     t = np.array([0.1,0,0]) # 100mm baseline
+    #     #     t.reshape((3,1))
+    #     # self.t = t
 
     # def save(self, filename, handler=pickle):
     #     if self.camera_model is None:
@@ -73,21 +75,38 @@ class StereoCalibration(object):
         d1 = cam.d
         rvecs1 = data["rvecs"]
         tvecs1 = data["tvecs"]
-        objpoints = data["objpoints"]
-        imgpoints_l =  data["imgpoints"]
+        objpts = data["objpoints"]
+        imgptsL = data["imgpoints"]
 
-        time.sleep(1)
+        # print(objpoints)
+
+        # time.sleep(1)
 
         cam, data = cc.calibrate(imgs_r, board)
         K2 = cam.K
         d2 = cam.d
         rvecs2 = data["rvecs"]
         tvecs2 = data["tvecs"]
-        imgpoints_r =  data["imgpoints"]
+        imgptsR = data["imgpoints"]
 
         # print(d1,d2)
 
         # self.save_cal_imgs = cc.save_cal_imgs
+        objpoints = []
+        imgpoints_r = []
+        imgpoints_l = []
+        for o,l,r in zip(objpts,imgptsL,imgptsR):
+            # must have all the same number of points for calibration
+            if o.shape[0] == l.shape[0] == r.shape[0]:
+                objpoints.append(o)
+                imgpoints_r.append(r)
+                imgpoints_l.append(l)
+            else:
+                print("bad points:", o.shape, l.shape, r.shape)
+
+        print(f"Object Pts: {len(objpoints)}")
+        print(f"Left Image Pts: {len(imgpoints_l)}")
+        print(f"Right Image Pts: {len(imgpoints_r)}")
 
         """
         CALIB_ZERO_DISPARITY: horizontal shift, cx1 == cx2
@@ -97,7 +116,7 @@ class StereoCalibration(object):
             # flags |= cv2.CALIB_FIX_INTRINSIC
             flags |= cv2.CALIB_ZERO_DISPARITY
             # flags |= cv2.CALIB_FIX_PRINCIPAL_POINT
-            # flags |= cv2.CALIB_USE_INTRINSIC_GUESS
+            flags |= cv2.CALIB_USE_INTRINSIC_GUESS
             # flags |= cv2.CALIB_FIX_FOCAL_LENGTH
             # flags |= cv2.CALIB_FIX_ASPECT_RATIO
             # flags |= cv2.CALIB_ZERO_TANGENT_DIST
@@ -107,8 +126,11 @@ class StereoCalibration(object):
             # flags |= cv2.CALIB_FIX_K4
             # flags |= cv2.CALIB_FIX_K5
 
-        stereocalib_criteria = (cv2.TERM_CRITERIA_MAX_ITER +
-                                cv2.TERM_CRITERIA_EPS, 100, 1e-5)
+        stereocalib_criteria = (
+            cv2.TERM_CRITERIA_MAX_ITER +
+            cv2.TERM_CRITERIA_EPS,
+            100,
+            1e-5)
 
         h,w = imgs_l[0].shape[:2]
         ret, K1, d1, K2, d2, R, T, E, F = cv2.stereoCalibrate(
@@ -117,8 +139,8 @@ class StereoCalibration(object):
             imgpoints_r,
             K1, d1,
             K2, d2,
-            # (w,h),
-            (h,w),
+            (w,h),
+            # (h,w),
             # R=self.R,
             # T=self.t,
             criteria=stereocalib_criteria,

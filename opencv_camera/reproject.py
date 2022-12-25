@@ -78,4 +78,5 @@ def visualizeReprojErrors(totalRSME, rmsPerView, reprojErrs, fontSize=16,legend=
     if ylim:
         ax.set_ylim(ylim)
     ax.tick_params(axis='both', which='major', labelsize=fontSize)
-    ax.grid(True);
+    ax.grid(True)
+    # return fig

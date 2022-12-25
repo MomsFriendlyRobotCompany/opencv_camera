@@ -5,14 +5,14 @@
 ##############################################
 # -*- coding: utf-8 -*
 import cv2
-import attr
+from dataclasses import dataclass
 import time
 
 
-@attr.s(slots=True)
+@dataclass
 class FlipBook:
-    imgs = attr.ib()
-    auto = attr.ib(default=True)
+    imgs: list
+    auto: bool = True
 
     def run(self):
         print('---------------------------------')

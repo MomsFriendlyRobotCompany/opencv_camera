@@ -9,25 +9,42 @@ from opencv_camera.color_space import bgr2gray, gray2bgr
 import numpy as np
 from ..apriltag.apriltag_marker import ApriltagMarker
 from colorama import Fore
+import cv2.aruco as aruco
 
+# cv2.aruco.DICT_APRILTAG_16H5 = 17
+# cv2.aruco.DICT_APRILTAG_25h9 = 18
+# cv2.aruco.DICT_APRILTAG_36H10 = 19
+# cv2.aruco.DICT_APRILTAG_36H11 = 20
+
+# tag_sizes = {
+#     'tag16h5' : 6,
+#     'tag25h9' : 7,
+#     'tag36h10': 8,
+#     'tag36h11': 8,
+# }
+
+# pixel size of marker on one side
+# 16h5 is 6x6 px
 tag_sizes = {
-    'tag16h5' : 6,
-    'tag25h9' : 7,
-    'tag36h10': 8,
-    'tag36h11': 8,
+    cv2.aruco.DICT_APRILTAG_16H5: 6,
+    cv2.aruco.DICT_APRILTAG_25H9: 7,
+    cv2.aruco.DICT_APRILTAG_36H10: 8,
+    cv2.aruco.DICT_APRILTAG_36H11: 8,
 }
 
 
 class ApriltagTargetFinder:
-    def __init__(self, detector, size, scale):
+    def __init__(self, size, scale, tagtype):
         """
         size: pattern of chess board, tuple(rows, columns)
         scale: real-world dimension of square side, example, 2 cm (0.02 m)
+        tagtype: cv2.aruco.DICT_APRILTAG_16H5
         """
-        self.detector = detector
+        # self.detector = detector
         self.marker_size = size
         self.marker_scale = scale
         self.type = "Apriltag"
+        self.tagtype = tagtype
 
     def find(self, gray, flags=None):
         """
@@ -44,13 +61,24 @@ class ApriltagTargetFinder:
         # additionally, I do a binary thresholding which greatly reduces
         # the apriltag's bad corner finding which resulted in non-square
         # tags which gave horrible calibration results.
-        ok,gray = cv2.threshold(gray,90,255,cv2.THRESH_BINARY)
+        # ok, gray = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)
+        # if not ok:
+        #     return False, None, None
 
-        tags = self.detector.detect(
+        # tags = self.detector.detect(
+        #     gray,
+        #     estimate_tag_pose=False,
+        #     camera_params=None,
+        #     tag_size=self.marker_scale)
+        corners, ids, rejectedImgPts = aruco.detectMarkers(
             gray,
-            estimate_tag_pose=False,
-            camera_params=None,
-            tag_size=self.marker_scale)
+            aruco.Dictionary_get(self.tagtype),
+            parameters=aruco.DetectorParameters_create(),
+        )
+        if corners is None or ids is None:
+            return False, None, None
+
+        tags = ApriltagMarker.tagArray(ids, corners)
 
         if len(tags) == 0:
             return False, None, None
@@ -94,8 +122,8 @@ class ApriltagTargetFinder:
         sz: size of board, ex: (6,9)
         ofw: offset width, ex: 2px
         """
-        family = self.detector.params["families"][0]
-        pix = tag_sizes[family]
+        # family = self.detector.params["families"][0]
+        pix = tag_sizes[self.tagtype]
         sz = self.marker_size
         scale = self.marker_scale/8
         ofr = pix+ofw

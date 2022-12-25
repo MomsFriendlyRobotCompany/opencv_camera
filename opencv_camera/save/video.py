@@ -4,7 +4,7 @@
 # see LICENSE for full details
 ##############################################
 # -*- coding: utf-8 -*
-import attr
+from dataclasses import dataclass
 import cv2             # OpenCV camera
 import time            # sleep
 import platform        # determine linux or darwin (OSX)
@@ -15,7 +15,7 @@ class VideoError(Exception):
     pass
 
 
-@attr.s(slots=True)
+@dataclass
 class SaveVideo(object):
     """
     Simple class to save frames to video (mp4v)
@@ -24,8 +24,8 @@ class SaveVideo(object):
     windows: h264?
     """
 
-    writer = attr.ib(default=None)
-    encoder = attr.ib(default=None)
+    writer = None
+    encoder = None
 
     def open(self, filename, width, height, fps=30, fourcc=None):
         self.close() # close if another is already open

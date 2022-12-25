@@ -4,25 +4,30 @@
 # see LICENSE for full details
 ##############################################
 # -*- coding: utf-8 -*
-# import cv2
-# import numpy as np
-import attr
 from colorama import Fore
+from pathlib import Path
+import yaml
+import numpy as np
+from dataclasses import dataclass
 
 
-@attr.s(slots=True)
+@dataclass
 class StereoCamera:
     """
-    Nice class for holding stereo camera info
+    Nice class for holding stereo camera info and
+    reading to or writing from yaml.
+
+    subcripts: 1-left, 2-right
     """
-    R = attr.ib(default=None) # between cameras
-    F = attr.ib(default=None) # fundamental matrix
-    E = attr.ib(default=None) # essential matrix
-    T = attr.ib(default=None) # between cameras
-    K1 = attr.ib(default=None) # left camera matrix
-    K2 = attr.ib(default=None) # right camera matrix
-    d1 = attr.ib(default=None) # left distortion coefficients
-    d2 = attr.ib(default=None)
+    # these default to None so from_yaml() function works correctly
+    K1: np.ndarray = None # left camera matrix
+    d1: np.ndarray = None # left distortion coefficients
+    K2: np.ndarray = None # right camera matrix
+    d2: np.ndarray = None # right distortion coefficients
+    R: np.ndarray = None  # rotation between left/right cameras
+    T: np.ndarray = None  # translation between left/right cameras
+    F: np.ndarray = None  # fundamental matrix
+    E: np.ndarray = None  # essential matrix
 
     def __str__(self):
         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))
@@ -38,12 +43,57 @@ class StereoCamera:
 
         s += f"{Fore.MAGENTA}"
         s += 'Extrinsic Camera Parameters -------\n'
-        s += f"  Translation between Left/Right Camera: {self.T.T[0]}\n"
+        s += f"  Translation between Left/Right Camera: {self.T}\n"
         s += f"  Rotation between Left/Right Camera:\n{ms(self.R)}\n"
         s += f"  Essential Matrix:\n{ms(self.E)}\n"
         s += f'  Fundatmental Matrix:\n{ms(self.F)}\n'
         s += f"{Fore.RESET}"
         return s
+
+    @classmethod
+    def from_yaml(cls, file):
+        if not isinstance(file, Path):
+            p = Path(file)
+        p = p.expanduser().resolve()
+
+        with p.open(mode="r") as fd:
+            info = yaml.safe_load(fd)
+
+        sc = cls()
+
+        for key in info.keys():
+            sc.__dict__[key] = np.array(info[key])
+
+        return sc
+
+    def to_yaml(self, filename):
+        camera_parameters = {
+            "K1": self.K1.tolist(),
+            "d1": self.d1.tolist(),
+            "K2": self.K2.tolist(),
+            "d2": self.d2.tolist(),
+            "T": self.T.tolist(),
+            "R": self.R.tolist(),
+            "F": self.F.tolist(),
+            "E": self.E.tolist()
+        }
+
+        p = Path(filename).expanduser().resolve()
+        with p.open("w") as fd:
+            yaml.safe_dump(camera_parameters, fd)
+
+    def p1(self):
+        """Returns projection matrix: P1 = K1*[I|0]"""
+        return self.K1 @ np.hstack((np.eye(3), np.zeros((3,1))))
+
+    def p2(self):
+        """Returns projection matrix: P2 = K2*[R|t]"""
+        return self.K2 @ np.hstack((self.R, self.T.T))
+
+
+
+
+
 
 
 
