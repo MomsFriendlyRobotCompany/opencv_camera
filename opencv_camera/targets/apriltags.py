@@ -36,9 +36,12 @@ tag_sizes = {
 class ApriltagTargetFinder:
     def __init__(self, size, scale, tagtype):
         """
+        Uses the built-in apriltag finder in OpenCV contrib library to find
+        apriltags.
+
         size: pattern of chess board, tuple(rows, columns)
         scale: real-world dimension of square side, example, 2 cm (0.02 m)
-        tagtype: cv2.aruco.DICT_APRILTAG_16H5
+        tagtype: example, cv2.aruco.DICT_APRILTAG_16H5
         """
         # self.detector = detector
         self.marker_size = size
@@ -97,7 +100,7 @@ class ApriltagTargetFinder:
                 obcorners = opdict[tag.tag_id]
             except KeyError as e:
                 # print(f"*** {e} ***")
-                invalid_id = True
+                # invalid_id = True
                 continue
 
             for oc in obcorners:

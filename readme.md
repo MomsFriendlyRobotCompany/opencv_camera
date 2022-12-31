@@ -83,6 +83,17 @@ Draw epipolar lines in stereo images with `drawEpipolarLines(imgpointsL,imgpoint
 
 ![](https://github.com/MomsFriendlyRobotCompany/opencv_camera/blob/master/pics/epipolar.png?raw=true)
 
+## Apriltags
+
+This library uses the builtin `cv2.aruco` module that can detect:
+
+- `DICT_APRILTAG_16H5`
+- `DICT_APRILTAG_25h9`
+- `DICT_APRILTAG_36h10`
+- `DICT_APRILTAG_36h11`
+
+**This is still a work in progress**
+
 ## Apps
 
 Use `program --help` to display switches for each of the following:
@@ -118,7 +129,7 @@ Use `program --help` to display switches for each of the following:
 | 2018-07-19 |  0.9.4 | simple clean-up and updating some things |
 | 2017-10-29 |  0.9.3 | bug fixes |
 | 2017-04-09 |  0.9.0 | initial python 3 support |
-| 2017-03-31 |  0.7.0 | refactored and got rid of things I don't need |
+| 2017-03-31 |  0.7.0 | refactored and got rid of things I do not need |
 | 2017-01-29 |  0.6.0 | added video capture (video and images) program |
 | 2016-12-30 |  0.5.3 | typo fix |
 | 2016-12-30 |  0.5.1 | refactored |

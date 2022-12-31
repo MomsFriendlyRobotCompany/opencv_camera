@@ -12,13 +12,17 @@ from dataclasses import dataclass
 from ..undistort import UnDistort
 
 class UndistortStereo:
+    """
+    Simple class that hold the information to undistort
+    a stereo image pair.
+    """
     def __init__(self, K1, d1, K2,d2, h, w, R):
         self.left = UnDistort(K1,d1,h,w)
         self.right = UnDistort(K2,d2,h,w,R)
 
-    def undistort(self, a, b):
-        a = self.left.undistort(a)
-        b = self.right.undistort(b)
+    def undistort(self, left, right):
+        a = self.left.undistort(left)
+        b = self.right.undistort(right)
         return a,b
 
 
@@ -46,8 +50,8 @@ class StereoCamera:
     T: np.ndarray  # translation between left/right cameras
     F: np.ndarray  # fundamental matrix
     E: np.ndarray  # essential matrix
-    # h: int # height/rows
-    # w: int # width/columns
+    # height: int # height/rows
+    # width: int # width/columns
 
     def __str__(self):
         ms = lambda m: "    {}".format(str(m).replace('\n','\n    '))
@@ -101,8 +105,8 @@ class StereoCamera:
             "R": self.R.tolist(),
             "F": self.F.tolist(),
             "E": self.E.tolist(),
-            # "w": self.w,
-            # "h": self.h,
+            # "width": self.width,
+            # "height": self.height,
         }
 
         p = Path(filename).expanduser().resolve()
@@ -118,6 +122,8 @@ class StereoCamera:
         return self.K2 @ np.hstack((self.R, self.T.T))
 
     def getUndistortion(self, h, w):
+        # w = self.width
+        # h = self.height
         return UndistortStereo(
             self.K1,
             self.d1,
