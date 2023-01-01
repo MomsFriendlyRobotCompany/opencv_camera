@@ -8,13 +8,8 @@ import numpy as np
 np.set_printoptions(precision=3)
 np.set_printoptions(suppress=True)
 import cv2
-import time
-from collections import namedtuple
-from ..undistort import DistortionCoefficients
+import time # date saved in output
 from ..color_space import bgr2gray, gray2bgr
-from .camera import Camera
-# from tqdm import tqdm
-from colorama import Fore
 
 
 class CameraCalibration:
@@ -53,9 +48,6 @@ class CameraCalibration:
             term = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 30, 0.001)
             corners = cv2.cornerSubPix(gray, corners, (5, 5), (-1, -1), term)
             imgpoints.append(corners.reshape(-1, 2))
-
-        # if len(bad_images) > 0:
-        #     print(f'{Fore.RED}>> Could not find markers in images: {bad_images}{Fore.RESET}')
 
         # M: number of images
         # N: number of tags found
@@ -105,9 +97,10 @@ class CameraCalibration:
             'date': time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime()),
             'markerType': board.type,
             'markerSize': board.marker_size,
-            'imageSize': images[0].shape,
+            'height': images[0].shape[0],
+            'width': images[0].shape[1],
             'K': K,
-            'd': dist, #DistortionCoefficients(dist),
+            'd': dist,
             'rms': rms,
             'rvecs': rvecs,
             'tvecs': tvecs,
@@ -121,12 +114,7 @@ class CameraCalibration:
             "width": images[0].shape[1]
         }
 
-        if ids is not None:
+        if board.has_ids is True:
             data["ids"] = ids
-
-        # cam = Camera(K, dist, *images[0].shape[:2])
-
-        # print(f"{Fore.GREEN}>> RMS: {rms:0.3f}px{Fore.RESET}")
-        # print("\n",cam)
 
         return data

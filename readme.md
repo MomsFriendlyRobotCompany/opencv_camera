@@ -106,7 +106,7 @@ Use `program --help` to display switches for each of the following:
 
 # ToDo
 
-- [ ] Add in `apriltag` calibration
+- [ ] Add in `apriltag` calibration ... maybe remove, seems to have lots of changes
 - [ ] Add pointcloud from stereo
 - [x] Add parameters for known cameras
 - [x] Add Jupyter notebook documentation and examples
@@ -116,10 +116,11 @@ Use `program --help` to display switches for each of the following:
 - [ ] Add `visualizeExtrinsics`
 - [x] Remove `attrs`
 - [x] Add save/load from yaml
+- [ ] Add stereo calibration pytest
 
 # Change Log
 
-| Data       | Version    | Notes                                     |
+| Date       | Version    | Notes                                     |
 |------------|------------|-------------------------------------------|
 |            | 2022.12.23 | changed version number to match date, changed to `opencv-contrib-python` |
 | 2020-12-27 | 0.10.10 | added distortion and reprojection display |

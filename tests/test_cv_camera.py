@@ -56,7 +56,7 @@ Opencv cv2.calibrateCamera() function Camera Matrix:
 ]
 """
 def test_checkerboard_calibrate():
-    print("")
+    # print("")
     imgs = get()
 
     board = ChessboardFinder((9,6), 1)
@@ -65,8 +65,28 @@ def test_checkerboard_calibrate():
     data = cal.calibrate(imgs, board)
     assert (data['rms'] - 0.5882563398961391) < 1e-6
 
-    print("camera matrix\n",data["K"],"\n")
-    print("distortion coeff:",data["d"],"\n")
+    K = data["K"]
+    assert (K[0,0] - 532.8) < .1
+    assert (K[1,1] - 532.9) < .1
+    assert (K[0,2] - 342) < 1
+    assert (K[1,2] - 234) < 1
+
+    h,w = imgs[0].shape[:2]
+    d = data["d"]
+    cam = Camera(K,d,h,w)
+    cam.to_yaml("camera.yml")
+
+    cam2 = Camera.from_yaml("camera.yml")
+
+    assert np.array_equal(cam.K, cam2.K)
+    assert np.array_equal(cam.d, cam2.d)
+    assert cam.h == cam2.h
+    assert cam.w == cam2.w
+
+    rm("camera.yml")
+
+    # print("camera matrix\n",data["K"],"\n")
+    # print("distortion coeff:",data["d"],"\n")
     # print("rms error:",data["rms"],"\n")
 
     # fb = FlipBook(cal.save_cal_imgs)
