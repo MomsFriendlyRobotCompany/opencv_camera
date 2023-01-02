@@ -55,7 +55,7 @@ class Camera:
             info = yaml.safe_load(fd)
 
         args = []
-        for key in ["K","d","w","h"]:
+        for key in ["K","d","h","w"]:
             args.append(np.array(info[key]))
 
         c = cls(*args)
@@ -66,8 +66,8 @@ class Camera:
         camera_parameters = {
             "K": self.K.tolist(),
             "d": self.d.tolist(),
-            "w": self.w,
             "h": self.h,
+            "w": self.w,
         }
 
         p = Path(filename).expanduser().resolve()

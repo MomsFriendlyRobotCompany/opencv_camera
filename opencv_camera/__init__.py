@@ -38,8 +38,8 @@ from .color_space import bgr2gray, gray2bgr
 from .color_space import rgb2gray, gray2rgb
 from .color_space import hsv2bgr, bgr2hsv
 from .color_space import bgr2rgb, rgb2bgr
-# from .color_space import bgr2gray, rgb2gray, gray2bgr, hsv2bgr, bgr2hsv
-# from .display import FlipBook
+
+from .blurry import isBlurry
 
 from .compression import Compressor
 

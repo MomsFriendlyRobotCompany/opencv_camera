@@ -18,6 +18,7 @@ class ChessboardFinder:
         self.marker_size = size
         self.marker_scale = scale
         self.type = "Chessboard"
+        self.has_ids = False
 
     def find(self, gray, flags=None):
         """
@@ -47,7 +48,7 @@ class ChessboardFinder:
         else:
             objp = self.objectPoints()
 
-        return ret, corners, objp
+        return ret, corners, objp, None
 
     def objectPoints(self):
         """

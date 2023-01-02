@@ -70,9 +70,9 @@ class StereoCalibration(object):
         # rms1, M1, d1, r1, t1, objpoints, imgpoints_l = cc.calibrate(imgs_l, board)
         # rms2, M2, d2, r2, t2, objpoints, imgpoints_r = cc.calibrate(imgs_r, board)
 
-        cam, data = cc.calibrate(imgs_l, board)
-        K1 = cam.K
-        d1 = cam.d
+        data = cc.calibrate(imgs_l, board)
+        K1 = data["K"]
+        d1 = data["d"]
         rvecs1 = data["rvecs"]
         tvecs1 = data["tvecs"]
         objpts = data["objpoints"]
@@ -82,9 +82,9 @@ class StereoCalibration(object):
 
         # time.sleep(1)
 
-        cam, data = cc.calibrate(imgs_r, board)
-        K2 = cam.K
-        d2 = cam.d
+        data = cc.calibrate(imgs_r, board)
+        K2 = data["K"]
+        d2 = data["d"]
         rvecs2 = data["rvecs"]
         tvecs2 = data["tvecs"]
         imgptsR = data["imgpoints"]
@@ -125,12 +125,24 @@ class StereoCalibration(object):
             # flags |= cv2.CALIB_FIX_K3
             # flags |= cv2.CALIB_FIX_K4
             # flags |= cv2.CALIB_FIX_K5
+            # flags |= cv2.CALIB_USE_EXTRINSIC_GUESS
 
         stereocalib_criteria = (
             cv2.TERM_CRITERIA_MAX_ITER +
             cv2.TERM_CRITERIA_EPS,
             100,
             1e-5)
+
+        for o in objpoints:
+            print(o.shape)
+
+        print("objpoints",type(objpoints),len(objpoints),objpoints[0].shape)
+        print("imgpoints_l",type(imgpoints_l),len(imgpoints_l),imgpoints_l[0].shape)
+        print("imgpoints_r",type(imgpoints_r),len(imgpoints_r),imgpoints_r[0].shape)
+
+        cv2.utils.dumpInputArrayOfArrays(objpoints)
+        cv2.utils.dumpInputArrayOfArrays(imgpoints_l)
+        cv2.utils.dumpInputArrayOfArrays(imgpoints_r)
 
         h,w = imgs_l[0].shape[:2]
         ret, K1, d1, K2, d2, R, T, E, F = cv2.stereoCalibrate(
@@ -143,6 +155,8 @@ class StereoCalibration(object):
             # (h,w),
             # R=self.R,
             # T=self.t,
+            # R=np.eye((3,3)),
+            # T=np.array([[0.031],[0],[0]]), # FIXME
             criteria=stereocalib_criteria,
             flags=flags)
 
@@ -155,37 +169,21 @@ class StereoCalibration(object):
             'markerType': board.type,
             'markerSize': board.marker_size,
             'imageSize': imgs_l[0].shape[:2],
-            # 'cameraMatrix1': K1,
-            # 'cameraMatrix2': K2,
-            # 'distCoeffs1': d1,
-            # 'distCoeffs2': d2,
+            'K1': K1,
+            'K2': K2,
+            'd1': d1,
+            'd2': d2,
             'rvecsL': rvecs1,
             "tvecsL": tvecs1,
             'rvecsR': rvecs2,
             "tvecsR": tvecs2,
-            # 'R': R,
-            # 'T': T,
-            # 'E': E,
-            # 'F': F,
+            'R': R,
+            'T': T,
+            'E': E,
+            'F': F,
             "objpoints": objpoints,
             "imgpointsL": imgpoints_l,
             "imgpointsR": imgpoints_r,
         }
 
-        sc = StereoCamera(
-            K1,d1,
-            K2,d2,
-            R,T,
-            F,
-            E
-        )
-        # sc.R = R
-        # sc.E = E
-        # sc.F = F
-        # sc.T = T
-        # sc.K1 = K1
-        # sc.K2 = K2
-        # sc.d1 = d1
-        # sc.d2 = d2
-
-        return ret, camera_model, sc
+        return ret, camera_model

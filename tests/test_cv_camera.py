@@ -1,19 +1,8 @@
-
-from opencv_camera import CameraCalibration
-from opencv_camera import ChessboardFinder
-# from opencv_camera import FlipBook
-from opencv_camera import UnDistort
-from opencv_camera import SaveVideo
-from opencv_camera import bgr2gray, gray2bgr
-from opencv_camera import rgb2bgr, bgr2rgb
-from opencv_camera import bgr2hsv, hsv2bgr
-from opencv_camera import Compressor
+from opencv_camera import *
 import opencv_camera
-# import slurm
 import cv2
 import numpy as np
 from pathlib import Path
-# from slurm.files import rm
 import pytest
 import os
 
@@ -67,17 +56,37 @@ Opencv cv2.calibrateCamera() function Camera Matrix:
 ]
 """
 def test_checkerboard_calibrate():
-    print("")
+    # print("")
     imgs = get()
 
     board = ChessboardFinder((9,6), 1)
 
     cal = CameraCalibration()
-    cam, data = cal.calibrate(imgs, board)
+    data = cal.calibrate(imgs, board)
     assert (data['rms'] - 0.5882563398961391) < 1e-6
 
-    print("camera matrix\n",data["K"],"\n")
-    print("distortion coeff:",data["d"],"\n")
+    K = data["K"]
+    assert (K[0,0] - 532.8) < .1
+    assert (K[1,1] - 532.9) < .1
+    assert (K[0,2] - 342) < 1
+    assert (K[1,2] - 234) < 1
+
+    h,w = imgs[0].shape[:2]
+    d = data["d"]
+    cam = Camera(K,d,h,w)
+    cam.to_yaml("camera.yml")
+
+    cam2 = Camera.from_yaml("camera.yml")
+
+    assert np.array_equal(cam.K, cam2.K)
+    assert np.array_equal(cam.d, cam2.d)
+    assert cam.h == cam2.h
+    assert cam.w == cam2.w
+
+    rm("camera.yml")
+
+    # print("camera matrix\n",data["K"],"\n")
+    # print("distortion coeff:",data["d"],"\n")
     # print("rms error:",data["rms"],"\n")
 
     # fb = FlipBook(cal.save_cal_imgs)

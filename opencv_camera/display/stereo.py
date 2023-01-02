@@ -41,8 +41,9 @@ def coverage(size, imgpoints):
     rad = 5*max(int(y/1000),1)
     c = (0,0,255)
     for f in imgpoints:
-        for x in f:
-            cv2.circle(tgt, tuple(x.astype(int)),rad,c,thickness=-1)
+        # for x in f:
+        #     cv2.circle(tgt, tuple(x.astype(int)),rad,c,thickness=-1)
+        cv2.circle(tgt, tuple(f.astype(int)),rad,c,thickness=-1)
 
     return tgt
 
