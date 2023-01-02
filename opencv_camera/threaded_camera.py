@@ -98,6 +98,9 @@ class ThreadedCamera:
         return s
 
     def set_resolution(self, resolution):
+        """
+        resolution: what supported resolution from the camera do you want (height,width)
+        """
         rows, cols = resolution
         self.camera.set(3, cols) #cv2.CAP_PROP_FRAME_WIDTH
         self.camera.set(4, rows) #cv2.CAP_PROP_FRAME_HEIGHT
@@ -110,6 +113,10 @@ class ThreadedCamera:
     def open(self, path=0, resolution=None, fmt=ColorSpace.bgr):
         """
         Opens the camera object and starts the internal loop in a thread
+
+        path: which camera to open 0,1,2, ..., default: 0
+        resolution: what supported resolution from the camera do you want (height,width)
+        fmt: image format, 1(BGR), 2(RGB), 4(HSV), 8(grayscale), default is BGR
         """
 
         if fmt not in list(ColorSpace):
@@ -123,9 +130,13 @@ class ThreadedCamera:
         if resolution:
             self.set_resolution(resolution)
 
+        width = self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        fps = int(self.camera.get(5))
+
         print("========================")
         print(f"Opened camera: {path}")
-        print(f"Resolution: {resolution}")
+        print(f"Resolution: {width}x{height} @ {fps}")
         print(f"Colorspace: {self.__colorspace()}")
         print("")
 
@@ -135,7 +146,7 @@ class ThreadedCamera:
         return self
 
     def read(self):
-        """Returns image frame"""
+        """Returns image frame or None if no frame captured"""
         if self.frame is None:
             return False, None
 
@@ -147,21 +158,21 @@ class ThreadedCamera:
         rate = Rate(self.thread_hz)
 
         while self.run:
+            rate.sleep()
             ok, img = self.camera.read()
 
-            if ok:
-                # self.lock.acquire()
+            if not ok:
+                continue
 
-                if self.fmt == ColorSpace.bgr:
-                    self.frame = img.copy()
-                elif self.fmt == ColorSpace.hsv:
-                    self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-                elif self.fmt == ColorSpace.rgb:
-                    self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                elif self.fmt == ColorSpace.gray:
-                    self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                else:
-                    print(f"{Fore.RED}*** Threaded Camera: Unknown color format: {self.fmt}, reset to BGR ***{Fore.RESET}")
-                    self.fmt = 1
-
-            rate.sleep()
+            if self.fmt == ColorSpace.bgr:
+                self.frame = img
+            elif self.fmt == ColorSpace.hsv:
+                self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            elif self.fmt == ColorSpace.rgb:
+                self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            elif self.fmt == ColorSpace.gray:
+                self.frame = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            else:
+                print(f"{Fore.RED}*** Threaded Camera: Unknown color format: {self.fmt}, reset to BGR ***{Fore.RESET}")
+                self.fmt = ColorSpace.bgr
+                self.frame = img

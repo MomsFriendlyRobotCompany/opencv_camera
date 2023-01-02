@@ -16,6 +16,122 @@ from ..mono.calibrate import CameraCalibration
 class ApriltagStereoCalibration:
     save_cal_imgs = None
 
+    def match(self,objpts, idsL, imgptsL, idsR, imgptsR):
+        """
+        idsL: list(np.array(N, ids))
+        imgptsL: list(np.array(N, 2d points))
+        """
+
+        objpoints = []
+        imgpoints_r = []
+        imgpoints_l = []
+
+        # trying to be efficient in the serach instead of using
+        # find() on the list
+        # print("Removing markers not seen in both frames:")
+        totalMarkers = 0
+        for img_num, (ob, idL, ipL, idR, ipR) in enumerate(zip(objpts, idsL, imgptsL, idsR, imgptsR)):
+            reject = 0
+            leftInfo = dict(zip(idL,tuple(zip(ipL, ob))))
+            rightInfo = dict(zip(idR, ipR))
+            top = []
+            timl = []
+            timr = []
+
+            print("ob idL imgL",ob.shape,idL.shape,ipL.shape)
+
+            # for each id found in left camera, see if the marker id
+            # was found in the right camera. If yes, save, if no,
+            # reject the marker
+            for id,(ipt,opt) in leftInfo.items():
+                print("id,ipt,opt",id,ipt, opt)
+                try:
+                    iptr = rightInfo[id]
+                    top.append(opt)
+                    timl.append(ipt)
+                    timr.append(iptr)
+                except KeyError:
+                    # id not found in right camera
+                    reject += 1
+                    continue
+            objpoints.append(np.array(top))
+            imgpoints_l.append(np.array(timl))
+            imgpoints_r.append(np.array(timr))
+            # if reject > 0:
+            #     total = max(len(idL), len(idR))
+            #     print(f"  Image {img_num}: rejected {reject} tags of {total} tags")
+
+            totalMarkers += len(top)
+
+        print(f"Total markers found in BOTH cameras: {totalMarkers}")
+
+        return objpoints,imgpoints_r,imgpoints_l
+
+
+    def match2(self,objpts, idsL, imgptsL, idsR, imgptsR):
+        """
+        M: images
+        N: found markers
+        all lists are length M
+
+        idsL/R:    list(np.array(N*4, 1))
+        imgptsL/R: list(np.array(N*4, 2))
+        objpts:    list(np.array(N*4, 3))
+        """
+
+        objpoints = []
+        imgpoints_r = []
+        imgpoints_l = []
+
+        # set(a).intersection(b)
+
+        # trying to be efficient in the serach instead of using
+        # find() on the list
+        # print("Removing markers not seen in both frames:")
+        totalMarkers = 0
+        for img_num, (ob, idL, ipL, idR, ipR) in enumerate(zip(objpts, idsL, imgptsL, idsR, imgptsR)):
+            reject = 0
+            top = []
+            timl = []
+            timr = []
+
+            # group the 4 corners of each marker together with
+            # its respective tagID
+            ipL = ipL.reshape((-1,4,2)) # 4 x 2d
+            ipR = ipR.reshape((-1,4,2)) # 4 x 2d
+            ob = ob.reshape((-1,4,3))   # 4 x 3d
+
+            leftInfo = dict(zip(idL,zip(ipL,ob)))
+            rightInfo = dict(zip(idR, ipR))
+
+            # for each id found in left camera, see if the marker id
+            # was found in the right camera. If yes, save, if no,
+            # reject the marker
+            for id,(ipt,opt) in leftInfo.items():
+                # print("id,ipt,opt",id,ipt, opt)
+                try:
+                    iptr = rightInfo[id]
+                    for i in range(4):
+                        top.append(opt[i])
+                        timl.append(ipt[i])
+                        timr.append(iptr[i])
+                except KeyError:
+                    # id not found in right camera
+                    reject += 1
+                    continue
+            objpoints.append(np.array(top))
+            imgpoints_l.append(np.array(timl))
+            imgpoints_r.append(np.array(timr))
+            # if reject > 0:
+            #     total = max(len(idL), len(idR))
+            #     print(f"  Image {img_num}: rejected {reject} tags of {total} tags")
+
+            totalMarkers += len(top)
+
+        print(f"Total markers found in BOTH cameras: {totalMarkers/4} marker or {totalMarkers} corners")
+
+        return objpoints,imgpoints_r,imgpoints_l
+
     def calibrate(self, imgs_l, imgs_r, board, flags=None):
         """
         This will save the found markers for camera_2 (right) only in
@@ -50,46 +166,7 @@ class ApriltagStereoCalibration:
         imgptsR = data["imgpoints"]
         idsR = data["ids"]
 
-        # self.save_cal_imgs = cc.save_cal_imgs
-        objpoints = []
-        imgpoints_r = []
-        imgpoints_l = []
-
-        # trying to be efficient in the serach instead of using
-        # find() on the list
-        print("Removing markers not seen in both frames:")
-        totalMarkers = 0
-        for img_num, (ob, idL, ipL, idR, ipR) in enumerate(zip(objpts, idsL, imgptsL, idsR, imgptsR)):
-            reject = 0
-            leftInfo = dict(zip(idL,tuple(zip(ipL, ob))))
-            rightInfo = dict(zip(idR, ipR))
-            top = []
-            timl = []
-            timr = []
-
-            # for each id found in left camera, see if the marker id
-            # was found in the right camera. If yes, save, if no,
-            # reject the marker
-            for id,(ipt,opt) in leftInfo.items():
-                try:
-                    iptr = rightInfo[id]
-                    top.append(opt)
-                    timl.append(ipt)
-                    timr.append(iptr)
-                except KeyError:
-                    # id not found in right camera
-                    reject += 1
-                    continue
-            objpoints.append(np.array(top))
-            imgpoints_l.append(np.array(timl))
-            imgpoints_r.append(np.array(timr))
-            if reject > 0:
-                total = max(len(idL), len(idR))
-                print(f"  Image {img_num}: rejected {reject} tags of {total} tags")
-
-            totalMarkers += len(top)
-
-        print(f"Total markers found in BOTH cameras: {totalMarkers}")
+        objpoints,imgpoints_r,imgpoints_l = self.match2(objpts, idsL, imgptsL, idsR, imgptsR)
 
         """
         CALIB_ZERO_DISPARITY: horizontal shift, cx1 == cx2
@@ -108,6 +185,7 @@ class ApriltagStereoCalibration:
             # flags |= cv2.CALIB_FIX_K3
             # flags |= cv2.CALIB_FIX_K4
             # flags |= cv2.CALIB_FIX_K5
+            # flags |= cv2.CALIB_USE_EXTRINSIC_GUESS
 
         stereocalib_criteria = (
             cv2.TERM_CRITERIA_MAX_ITER +
@@ -116,6 +194,28 @@ class ApriltagStereoCalibration:
             1e-5)
 
         h,w = imgs_l[0].shape[:2]
+
+        # cv2.utils.dumpInputArray(np.array(objpoints))
+        # cv2.utils.dumpInputArray(np.array(imgpoints_l))
+        # cv2.utils.dumpInputArray(np.array(imgpoints_r))
+
+        # for o in objpoints:
+        #     print(o.shape)
+        #     # print(o)
+        #     # print("-------")
+
+        print("objpoints",type(objpoints),len(objpoints),objpoints[0].shape)
+        print("imgpoints_l",type(imgpoints_l),len(imgpoints_l),imgpoints_l[0].shape)
+        print("imgpoints_r",type(imgpoints_r),len(imgpoints_r),imgpoints_r[0].shape)
+
+
+        cv2.utils.dumpInputArrayOfArrays(objpoints)
+        cv2.utils.dumpInputArrayOfArrays(imgpoints_l)
+        cv2.utils.dumpInputArrayOfArrays(imgpoints_r)
+        # cv2.utils.dumpInputArray(np.array(objpoints))
+        # cv2.utils.dumpInputArray(np.array(imgpoints_l))
+        # cv2.utils.dumpInputArray(np.array(imgpoints_r))
+
         ret, K1, d1, K2, d2, R, T, E, F = cv2.stereoCalibrate(
             objpoints,
             imgpoints_l,
@@ -126,6 +226,8 @@ class ApriltagStereoCalibration:
             # (h,w),
             # R=self.R,
             # T=self.t,
+            # R=np.eye(3,3),
+            # T=np.array([[0.031],[0],[0]]), # FIXME
             criteria=stereocalib_criteria,
             flags=flags)
 

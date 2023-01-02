@@ -71,30 +71,32 @@ class ApriltagTargetFinder:
         )
         if corners is None or ids is None:
             return False, None, None
+        elif len(corners) == 0:
+            return False, None, None
 
         ids = ids.ravel() # flatten in an array
 
-        # 36h10 is 8x8
-        # min pix/bit sampling 5
-        # need each side of tag to 8*5 = 40
-        min_pix = self.bitsPerPixel * self.markerSizePx
-        goodpts = []
-        goodids = []
-        for i,c in zip(ids, corners):
-            c = c.reshape(-1,2) # make (4,2)
-            dist = np.sqrt((c[0,0] - c[1,0])**2 + (c[0,1] - c[1,1])**2)
-            if dist < min_pix:
-                # print(f"Bad image {i}: {c}")
-                continue
-
-            goodpts.append(c)
-            goodids.append(i)
+        # interesting --------------------------
+        # # 36h10 is 8x8
+        # # min pix/bit sampling 5
+        # # need each side of tag to 8*5 = 40
+        # min_pix = self.bitsPerPixel * self.markerSizePx
+        # goodpts = []
+        # goodids = []
+        # for i,c in zip(ids, corners):
+        #     c = c.reshape(-1,2) # make (4,2)
+        #     dist = np.sqrt((c[0,0] - c[1,0])**2 + (c[0,1] - c[1,1])**2)
+        #     if dist < min_pix:
+        #         # print(f"Bad image {i}: {c}")
+        #         continue
+        #     goodpts.append(c)
+        #     goodids.append(i)
 
         # if len(goodpts) > 0:
         #     print(f"Found {len(goodpts)} corners")
 
-        corners = goodpts # fixme
-        ids = goodids # fixme
+        # corners = goodpts # fixme
+        # ids = goodids # fixme
 
         # print(corners)
         # print(ids)
@@ -108,6 +110,9 @@ class ApriltagTargetFinder:
         #     print(f"Found {len(tags)} tags")
         #---
 
+        corners = [c.reshape(-1,2) for c in corners] # make (4,2)
+        # corners = corners.reshape(-1,2) # make (4,2) - invalid
+        # print("apriltagfinder corners",np.array(corners).shape)
 
         # get complete listing of objpoints in a target
         opdict = self.objectPoints
@@ -130,16 +135,38 @@ class ApriltagTargetFinder:
             for oc in obcorners:
                 ob.append(oc)
             for c in corner:
-                tt.append(c)
+                tt.append([c])
+            # ob.append(obcorners)
+            # tt.append(corner)
 
         corners = np.array(tt, dtype=np.float32)
         objpts = np.array(ob, dtype=np.float32)
 
+        # print("apriltag.find corner obj",corners.shape,objpts.shape)
+
+        # corners:
         return True, corners, objpts, ids
 
     def generatePoints(self):
         """
         Returns a set of the target's ideal 3D feature points.
+
+        aruco pt order:
+        3     4
+        +-----+
+        |     |
+        |     |
+        +-----+
+        2     1
+
+        pupil labs pt order:
+        4     3
+        +-----+
+        |     |
+        |     |
+        +-----+
+        1     2
+
         sz: size of board, ex: (6,9)
         ofw: offset width, ex: 2px
         """
@@ -167,19 +194,29 @@ class ApriltagTargetFinder:
                 rr = r+pix
                 cc = c+pix
 
+                # corners2d = (
+                #     (r,c),
+                #     (rr,c),
+                #     (rr,cc),
+                #     (r,cc))
                 corners2d = (
-                    (r,c),
-                    (rr,c),
                     (rr,cc),
-                    (r,cc))
+                    (r,cc),
+                    (r,c),
+                    (rr,c))
 
                 imgpts[x] = np.array(corners2d, dtype=int)
 
+                # corners3d = (
+                #     (r,c,0),
+                #     (rr,c,0),
+                #     (rr,cc,0),
+                #     (r,cc,0))
                 corners3d = (
-                    (r,c,0),
-                    (rr,c,0),
                     (rr,cc,0),
-                    (r,cc,0)) # ccw - best
+                    (r,cc,0),
+                    (r,c,0),
+                    (rr,c,0))
 
                 corners3d = pxscale * np.array(corners3d)
 

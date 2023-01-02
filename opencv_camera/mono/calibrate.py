@@ -40,6 +40,8 @@ class CameraCalibration:
                 # bad_images.append(cnt)
                 continue
 
+            # print("board.find",ok, type(corners), len(corners), corners[0].shape, type(objp),len(objp), objp[0].shape)
+
             objpoints.append(objp)
 
             if tagids is not None:
@@ -47,6 +49,7 @@ class CameraCalibration:
 
             term = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_COUNT, 30, 0.001)
             corners = cv2.cornerSubPix(gray, corners, (5, 5), (-1, -1), term)
+            # print("corners",corners.shape)
             imgpoints.append(corners.reshape(-1, 2))
 
         # M: number of images
