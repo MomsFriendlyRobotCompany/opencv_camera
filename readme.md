@@ -83,17 +83,6 @@ Draw epipolar lines in stereo images with `drawEpipolarLines(imgpointsL,imgpoint
 
 ![](https://github.com/MomsFriendlyRobotCompany/opencv_camera/blob/master/pics/epipolar.png?raw=true)
 
-## Apriltags
-
-This library uses the builtin `cv2.aruco` module that can detect:
-
-- `DICT_APRILTAG_16H5`
-- `DICT_APRILTAG_25h9`
-- `DICT_APRILTAG_36h10`
-- `DICT_APRILTAG_36h11`
-
-**This is still a work in progress**
-
 ## Apps
 
 Use `program --help` to display switches for each of the following:
@@ -106,7 +95,7 @@ Use `program --help` to display switches for each of the following:
 
 # ToDo
 
-- [ ] Add in `apriltag` calibration ... maybe remove, seems to have lots of changes
+- [x] Remoded `apriltag` calibration, moved to `moms_apriltag` library
 - [ ] Add pointcloud from stereo
 - [x] Add parameters for known cameras
 - [x] Add Jupyter notebook documentation and examples
@@ -114,9 +103,9 @@ Use `program --help` to display switches for each of the following:
 - [x] Add `computeReprojectionErrors` and `visualizeReprojErrors`
 - [x] Add `visualizeDistortion`
 - [ ] Add `visualizeExtrinsics`
-- [x] Remove `attrs`
-- [x] Add save/load from yaml
-- [ ] Add stereo calibration pytest
+- [x] Remove `attrs`, replaced with python's `dataclass`
+- [x] Add save/load from `yaml`
+- [x] Add stereo calibration `pytest`
 
 # Change Log
 
