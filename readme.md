@@ -95,7 +95,7 @@ Use `program --help` to display switches for each of the following:
 
 # ToDo
 
-- [x] Remoded `apriltag` calibration, moved to `moms_apriltag` library
+- [x] Removed `apriltag` calibration, moved to `moms_apriltag` library
 - [ ] Add pointcloud from stereo
 - [x] Add parameters for known cameras
 - [x] Add Jupyter notebook documentation and examples
